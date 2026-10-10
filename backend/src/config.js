@@ -53,8 +53,17 @@ export const PLANNER = {
   transferWalkMaxM: 500, // walking link between any two nearby stops
   accessWalkMaxM: 1500, // walk from a raw lat/lng to the first stop
   accessMinStops: 3, // always offer at least this many nearest stops
-  dwellMin: 0.5, // per intermediate stop
+  transferBufferMin: 2, // spare time required at every change, on top of any walk
+  maxRides: 5, // up to 4 changes
+  similarArrivalMin: 3, // arrivals this close count as equally fast when recommending
   maxOptions: 5,
+};
+
+// Heat-aware routing. 40 °C is IMD's minimum maximum-temperature for a heatwave over the plains.
+export const HEAT = {
+  thresholdC: 40, // feels-like temperature at which walking is weighed down
+  longWalkM: 300, // walks this long get a heat warning
+  windowMin: 10, // in heat, prefer less walking among routes arriving within this of the fastest
 };
 
 export const OVERLAP = {

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { MODES } from '../config.js';
 import { haversine } from '../utils/geo.js';
+import { scheduleGaps } from './schedules.js';
 
 const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
@@ -15,13 +16,14 @@ function readJson(name) {
 }
 
 /**
- * Loads stops, lines and fares, and derives the per-stop line index and
- * per-segment distances used everywhere else.
+ * Loads stops, lines, fares and schedules, and derives the per-stop line
+ * index and per-segment distances used everywhere else.
  */
 export function loadNetwork() {
   const stopList = readJson('stops.json');
   const lineList = readJson('lines.json');
   const fares = readJson('fares.json');
+  const schedules = existsSync(path.join(DATA_DIR, 'schedules.json')) ? readJson('schedules.json') : {};
 
   const stops = new Map(stopList.map((s) => [s.id, { ...s, lines: [] }]));
   const lines = new Map();
@@ -33,8 +35,7 @@ export function loadNetwork() {
     const mode = MODES[raw.mode];
     if (!mode) throw new Error(`Line ${raw.id} has unknown mode ${raw.mode}`);
     const missing = [
-      !(raw.avgSpeedKmph > 0) && 'avgSpeedKmph',
-      !(raw.headwayMin > 0) && 'headwayMin',
+      ...scheduleGaps(schedules[raw.id], raw),
       !fares[raw.mode]?.slabs?.length && `fares.${raw.mode}`,
     ].filter(Boolean);
     if (missing.length) {
@@ -55,6 +56,7 @@ export function loadNetwork() {
       lengthKm: cumKm[cumKm.length - 1],
       operator: raw.operator ?? mode.operator,
       color: raw.color ?? mode.color,
+      schedule: schedules[raw.id],
     };
     lines.set(line.id, line);
     stopIds.forEach((id, idx) => stops.get(id).lines.push({ lineId: line.id, idx }));
@@ -83,8 +85,9 @@ export function lineSummary(line, stops, withGeometry = false) {
     mode: line.mode,
     operator: line.operator,
     color: line.color,
-    headwayMin: line.headwayMin,
-    avgSpeedKmph: line.avgSpeedKmph,
+    serviceStart: line.schedule?.serviceStart ?? null,
+    serviceEnd: line.schedule?.serviceEnd ?? null,
+    runTimeMin: line.schedule?.runTimeMin ?? null,
     lengthKm: round(line.lengthKm, 2),
     stopCount: line.stops.length,
     from: stops.get(line.stops[0])?.name,

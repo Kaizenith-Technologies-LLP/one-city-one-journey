@@ -5,6 +5,8 @@ import { dashboard } from '../services/admin/dashboard.js';
 import * as net from '../services/admin/network-edit.js';
 import { getSettings, updateSettings, resetSettings } from '../services/admin/settings.js';
 import { listTickets, getTicket, validateTicket, cancelTicket, revenueReport, verifyQr } from '../services/admin/tickets.js';
+import { listClosures, createClosure, updateClosure, deleteClosure, advisory } from '../services/closures.js';
+import { morningBrief } from '../services/admin/brief.js';
 
 /** Admin API, mounted by index.js at /api/admin. */
 const admin = express();
@@ -145,6 +147,31 @@ admin.post('/tickets/:id/cancel', (req, res) => {
 });
 
 admin.get('/reports/revenue', (req, res) => res.json(revenueReport({ from: str(req.query.from), to: str(req.query.to) })));
+
+// ---------- closures (diversions) + morning brief ----------
+
+admin.get('/closures', (req, res) => res.json(listClosures({ status: str(req.query.status) }).map((c) => ({ ...c, advisory: advisory(c) }))));
+admin.post('/closures', (req, res) => {
+  const c = createClosure(req.body ?? {});
+  audit(req, 'create', 'closure', c.id, { after: c });
+  res.status(201).json({ ...c, advisory: advisory(c) });
+});
+admin.put('/closures/:id', (req, res) => {
+  const { before, after } = updateClosure(req.params.id, req.body ?? {});
+  audit(req, 'update', 'closure', after.id, { before, after });
+  res.json({ ...after, advisory: advisory(after) });
+});
+admin.delete('/closures/:id', (req, res) => {
+  const c = deleteClosure(req.params.id);
+  audit(req, 'delete', 'closure', c.id, { before: c });
+  res.json({ deleted: c.id });
+});
+
+admin.get('/brief', async (req, res) => {
+  const date = str(req.query.date);
+  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'date must be YYYY-MM-DD' });
+  res.json(await morningBrief(date));
+});
 
 // ---------- misc ----------
 

@@ -3,7 +3,8 @@ import { MODES } from '../../config.js';
 import { getState } from '../../state.js';
 import { parseLatLng } from '../../utils/geo.js';
 import { round } from '../network.js';
-import { httpError } from '../planner.js';
+import { httpError, parseDepart } from '../planner.js';
+import { activeClosures } from '../closures.js';
 import { readStorage, writeStorage } from './store.js';
 
 const FILE = 'tickets.json';
@@ -58,7 +59,8 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
   const { planner } = getState();
   const from = endpoint(body.from, body.fromName, 'from');
   const to = endpoint(body.to, body.toName, 'to');
-  const { options, from: fromPoint, to: toPoint } = planner.plan(from, to);
+  const at = parseDepart(body.depart, now);
+  const { options, from: fromPoint, to: toPoint } = planner.plan(from, to, { at, closures: activeClosures(at) });
   if (!options.length) throw httpError(404, 'No transit option found for this trip');
   const opt =
     (body.signature && options.find((o) => o.signature === body.signature)) ||
@@ -92,7 +94,7 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
     splitMethod: opt.fareSplit.method,
     legs: opt.legs
       .filter((l) => l.type === 'ride')
-      .map((l) => ({ mode: l.mode, operator: l.operator, lineId: l.lineId, line: l.lineShortName, lineName: l.lineName, color: l.color, from: l.from.name, fromStopId: l.from.stopId, to: l.to.name, toStopId: l.to.stopId, stops: l.stopCount, distanceKm: l.distanceKm })),
+      .map((l) => ({ mode: l.mode, operator: l.operator, lineId: l.lineId, line: l.lineShortName, lineName: l.lineName, color: l.color, from: l.from.name, fromStopId: l.from.stopId, to: l.to.name, toStopId: l.to.stopId, stops: l.stopCount, distanceKm: l.distanceKm, departTime: l.departTime, arriveTime: l.arriveTime })),
     createdAt,
     validUntil: new Date(now.getTime() + VALID_HOURS * 3600e3).toISOString(),
     usedAt: null,

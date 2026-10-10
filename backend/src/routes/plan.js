@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import { FARE_SHARE, MODES } from '../config.js';
+import { FARE_SHARE, HEAT, MODES } from '../config.js';
+import { activeClosures, publicClosures } from '../services/closures.js';
+import { weatherAt } from '../services/weather.js';
 import { getState } from '../state.js';
 import { parseLatLng } from '../utils/geo.js';
 import { round } from '../services/network.js';
-import { httpError } from '../services/planner.js';
+import { httpError, parseDepart } from '../services/planner.js';
 import { revenueReport } from '../services/admin/tickets.js';
 
 const router = Router();
@@ -15,17 +17,20 @@ function parseEndpoint(value, name, label) {
   return p ? { point: p, name } : { stopId: String(value) };
 }
 
-router.get('/plan', (req, res) => {
+router.get('/plan', async (req, res) => {
   const { planner } = getState();
   const from = parseEndpoint(req.query.from, req.query.fromName, 'from');
   const to = parseEndpoint(req.query.to, req.query.toName, 'to');
-  const result = planner.plan(from, to);
-  const sort = req.query.sort;
-  if (sort && ['totalMin', 'fare', 'walkM', 'transfers'].includes(sort)) {
-    result.options.sort((a, b) => a[sort] - b[sort] || a.totalMin - b.totalMin);
-  }
-  res.json(result);
+  const at = parseDepart(req.query.depart);
+  const closures = activeClosures(at);
+  const result = planner.plan(from, to, { at, closures, weather: await weatherAt(at) });
+  res.json({ ...result, disruptions: publicClosures(at).filter((c) => c.status === 'active') });
 });
+
+/** Active and upcoming closures with advisories in English, Gujarati and Hindi. */
+router.get('/closures', (_req, res) => res.json(publicClosures()));
+
+router.get('/weather', async (_req, res) => res.json({ now: await weatherAt(), thresholdC: HEAT.thresholdC }));
 
 /** Operator settlement from integrated tickets actually issued (net of refunds). */
 router.get('/settlement', (req, res) => {

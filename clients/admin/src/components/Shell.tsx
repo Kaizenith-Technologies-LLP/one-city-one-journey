@@ -7,6 +7,8 @@ import { API_BASE, getToken, setToken } from "@/lib/api";
 
 const NAV: { href: string; label: string; icon: string }[] = [
   { href: "/dashboard", label: "Dashboard", icon: "M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z" },
+  { href: "/brief", label: "Morning brief", icon: "M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h8" },
+  { href: "/closures", label: "Diversions", icon: "M12 2 2 21h20L12 2zm0 7v5m0 3h.01" },
   { href: "/stations", label: "Stations", icon: "M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" },
   { href: "/lines", label: "Lines & routes", icon: "M4 6h16M4 12h16M4 18h10" },
   { href: "/hubs", label: "Interchange hubs", icon: "M12 2 2 7l10 5 10-5-10-5zm-10 10 10 5 10-5M2 17l10 5 10-5" },

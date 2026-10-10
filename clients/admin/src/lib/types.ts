@@ -116,3 +116,42 @@ export type Hub = {
 export type AuditEntry = { id: string; at: string; action: string; entity: string; entityId: string | null; details: Record<string, unknown>; ip: string | null };
 
 export type Paged<T> = { total: number; items: T[] };
+
+export type ClosureType = "line" | "section" | "stop";
+export type Closure = {
+  id: string;
+  type: ClosureType;
+  title: string;
+  reason: string;
+  lineId?: string;
+  fromStopId?: string;
+  toStopId?: string;
+  stopId?: string;
+  startsAt: string;
+  endsAt: string;
+  status: "upcoming" | "active" | "ended";
+  advisory: { en: string; gu: string; hi: string; whatsapp: string; affectedLines: string[] };
+};
+
+export type BriefOperator = {
+  operator: string;
+  operatorName: string;
+  mode: Mode;
+  tickets: number;
+  revenue: number;
+  passengerKm: number;
+  avgTickets: number;
+  avgRevenue: number;
+  ticketsChangePct: number | null;
+  revenueChangePct: number | null;
+};
+export type Brief = {
+  date: string;
+  generatedAt: string;
+  headline: string;
+  totals: { tickets: number; net: number; refunds: number; cancelled: number; multiOperator: number; avgTickets: number; avgNet: number };
+  operators: BriefOperator[];
+  exceptions: { severity: "high" | "medium" | "info"; title: string; detail: string; possibleCauses: string[] }[];
+  weather: { date: string; maxTempC: number; maxFeelsLikeC: number; precipMm: number; source: string } | null;
+  events: { closures: { id: string; title: string; type: ClosureType; startsAt: string; endsAt: string }[]; adminChanges: { at: string; action: string; entity: string; entityId: string | null }[] };
+};
