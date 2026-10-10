@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "validate": "node scripts/validate-data.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "validate": "node scripts/validate-data.mjs"
   },
   "engines": {
     "node": ">=20"

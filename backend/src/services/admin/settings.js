@@ -1,5 +1,4 @@
 import { MODES, FARE_SHARE, SETTINGS_DEFAULTS, applySettings, readSettingsFile } from '../../config.js';
-import { getState } from '../../state.js';
 import { writeStorage } from './store.js';
 import { checkSettings } from './validate.js';
 
@@ -22,21 +21,11 @@ export function updateSettings(body) {
   const next = { ...current, ...patch, costWeights: { ...current.costWeights, ...patch.costWeights } };
   writeStorage('settings.json', next);
   applySettings(next);
-  clearSettlementCache();
   return { before, after: getSettings() };
 }
 
 export function resetSettings() {
   writeStorage('settings.json', {});
   applySettings({});
-  clearSettlementCache();
   return getSettings();
-}
-
-function clearSettlementCache() {
-  try {
-    getState().settlementCache.clear();
-  } catch {
-    // data not loaded; nothing cached
-  }
 }

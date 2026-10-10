@@ -74,7 +74,7 @@ export default function LinesPage() {
                 <td className="td hidden text-xs md:table-cell">{l.from} &rarr; {l.to}</td>
                 <td className="td text-right tabular-nums">{l.stopCount}</td>
                 <td className="td hidden text-right tabular-nums sm:table-cell">{l.lengthKm}</td>
-                <td className="td hidden text-right tabular-nums sm:table-cell">{l.headwayMin} min</td>
+                <td className="td hidden text-right tabular-nums sm:table-cell">{l.headwayMin == null ? "not set" : `${l.headwayMin} min`}</td>
                 <td className="td">
                   <StatusBadge status={l.active ? "active" : "suspended"} />
                   {l.suspendedReason && <div className="mt-0.5 max-w-[10rem] truncate text-[11px] text-slate-500" title={l.suspendedReason}>{l.suspendedReason}</div>}
@@ -119,7 +119,7 @@ function LineDrawer({ id, onClose, onSaved }: { id: string; onClose: () => void;
     if (isNew) return;
     api<LineDetail>(`/admin/lines/${encodeURIComponent(id)}`)
       .then((l) => {
-        setForm({ id: l.id, name: l.name, shortName: l.shortName, mode: l.mode, operator: l.operator, color: l.color, avgSpeedKmph: String(l.avgSpeedKmph), headwayMin: String(l.headwayMin), active: l.active, suspendedReason: l.suspendedReason ?? "" });
+        setForm({ id: l.id, name: l.name, shortName: l.shortName, mode: l.mode, operator: l.operator, color: l.color, avgSpeedKmph: l.avgSpeedKmph == null ? "" : String(l.avgSpeedKmph), headwayMin: l.headwayMin == null ? "" : String(l.headwayMin), active: l.active, suspendedReason: l.suspendedReason ?? "" });
         setStops(l.stops);
       })
       .catch((e) => setError(e.message));

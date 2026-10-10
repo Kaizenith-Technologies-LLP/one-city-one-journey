@@ -88,7 +88,7 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
     transfers: opt.transfers,
     modes: opt.modes,
     operators: opt.operators,
-    split: opt.fareSplit.shares.map(({ operator, operatorName, mode, km, sharePct, amount }) => ({ operator, operatorName, mode, km, sharePct, amount })),
+    split: opt.fareSplit.shares.map(({ operator, operatorName, mode, km, standaloneFare, sharePct, amount }) => ({ operator, operatorName, mode, km, standaloneFare, sharePct, amount })),
     splitMethod: opt.fareSplit.method,
     legs: opt.legs
       .filter((l) => l.type === 'ride')
@@ -189,9 +189,10 @@ export function revenueReport({ from, to } = {}) {
     d.revenue += t.fare - refund;
     days.set(day, d);
     for (const s of t.split) {
-      const o = ops.get(s.operator) ?? { operator: s.operator, operatorName: s.operatorName, mode: s.mode, color: MODES[s.mode]?.color, tickets: 0, passengerKm: 0, gross: 0, net: 0 };
+      const o = ops.get(s.operator) ?? { operator: s.operator, operatorName: s.operatorName, mode: s.mode, color: MODES[s.mode]?.color, tickets: 0, passengerKm: 0, standalone: 0, gross: 0, net: 0 };
       o.tickets++;
       o.passengerKm += s.km;
+      o.standalone += (s.standaloneFare ?? 0) * keep;
       o.gross += s.amount;
       o.net += s.amount * keep;
       ops.set(s.operator, o);
@@ -204,7 +205,7 @@ export function revenueReport({ from, to } = {}) {
     to: to ?? null,
     totals: { ...totals, gross: round(totals.gross, 2), refunds: round(totals.refunds, 2), net: round(totals.net, 2) },
     operators: [...ops.values()]
-      .map((o) => ({ ...o, passengerKm: round(o.passengerKm, 1), gross: round(o.gross, 2), net: round(o.net, 2), sharePct: round((o.net / net) * 100, 1) }))
+      .map((o) => ({ ...o, passengerKm: round(o.passengerKm, 1), standalone: round(o.standalone, 2), gross: round(o.gross, 2), net: round(o.net, 2), sharePct: round((o.net / net) * 100, 1) }))
       .sort((a, b) => b.net - a.net),
     daily: [...days.values()].map((d) => ({ ...d, revenue: round(d.revenue, 2) })).sort((a, b) => a.date.localeCompare(b.date)),
   };

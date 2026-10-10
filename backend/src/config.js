@@ -15,52 +15,36 @@ export const MODES = {
     operator: 'GMRC',
     operatorName: 'Gujarat Metro Rail Corporation',
     color: '#1E5BC6',
-    defaultSpeedKmph: 33,
-    defaultHeadwayMin: 10,
     // Transfers inside the paid area (e.g. Blue <-> Red) keep one ticket.
     sharedTicketWithinMode: true,
-    // Relative cost per passenger-km, used by the fare-sharing split.
-    costWeight: 1.4,
   },
   brts: {
     label: 'BRTS',
     operator: 'AJL',
     operatorName: 'Ahmedabad Janmarg Ltd (BRTS)',
     color: '#D7263D',
-    defaultSpeedKmph: 22,
-    defaultHeadwayMin: 8,
     sharedTicketWithinMode: true,
-    costWeight: 1.0,
   },
   amts: {
     label: 'AMTS',
     operator: 'AMTS',
     operatorName: 'Ahmedabad Municipal Transport Service',
     color: '#F4A300',
-    defaultSpeedKmph: 16,
-    defaultHeadwayMin: 15,
     sharedTicketWithinMode: false,
-    costWeight: 0.8,
   },
   gsrtc: {
     label: 'GSRTC',
     operator: 'GSRTC',
     operatorName: 'Gujarat State Road Transport Corporation',
     color: '#2A9D8F',
-    defaultSpeedKmph: 25,
-    defaultHeadwayMin: 20,
     sharedTicketWithinMode: false,
-    costWeight: 0.9,
   },
   gmcbus: {
     label: 'Gandhinagar City Bus',
     operator: 'GMC',
     operatorName: 'Gandhinagar Municipal Corporation',
     color: '#8E44AD',
-    defaultSpeedKmph: 18,
-    defaultHeadwayMin: 20,
     sharedTicketWithinMode: false,
-    costWeight: 0.8,
   },
 };
 
@@ -87,7 +71,9 @@ export const FARE_SHARE = {
 export const SETTINGS_DEFAULTS = {
   integrationDiscount: FARE_SHARE.integrationDiscount,
   fareWeight: FARE_SHARE.fareWeight,
-  costWeights: Object.fromEntries(Object.entries(MODES).map(([k, m]) => [k, m.costWeight])),
+  // Relative operating cost per passenger-km for each mode. Unset until an admin
+  // enters real figures; until then fares are split on standalone fares alone.
+  costWeights: {},
 };
 
 export function readSettingsFile() {
@@ -105,7 +91,7 @@ export function applySettings(overrides = readSettingsFile()) {
   const o = { ...SETTINGS_DEFAULTS, ...overrides, costWeights: { ...SETTINGS_DEFAULTS.costWeights, ...overrides.costWeights } };
   FARE_SHARE.integrationDiscount = o.integrationDiscount;
   FARE_SHARE.fareWeight = o.fareWeight;
-  for (const [k, w] of Object.entries(o.costWeights)) if (MODES[k]) MODES[k].costWeight = w;
+  for (const [k, m] of Object.entries(MODES)) m.costWeight = o.costWeights[k];
   return o;
 }
 

@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import { FARE_SHARE, MODES } from '../config.js';
 import { getState } from '../state.js';
 import { parseLatLng } from '../utils/geo.js';
+import { round } from '../services/network.js';
 import { httpError } from '../services/planner.js';
-import { simulateSettlement } from '../services/settlement.js';
+import { revenueReport } from '../services/admin/tickets.js';
 
 const router = Router();
 
@@ -25,15 +27,34 @@ router.get('/plan', (req, res) => {
   res.json(result);
 });
 
+/** Operator settlement from integrated tickets actually issued (net of refunds). */
 router.get('/settlement', (req, res) => {
-  const state = getState();
-  const trips = Math.min(Math.max(Number(req.query.trips) || 300, 10), 2000);
-  const seed = Number(req.query.seed) || 42;
-  const key = `${trips}:${seed}`;
-  if (!state.settlementCache.has(key)) {
-    state.settlementCache.set(key, simulateSettlement(state.network, state.planner, { trips, seed }));
-  }
-  res.json(state.settlementCache.get(key));
+  const { totals, operators } = revenueReport({ from: req.query.from, to: req.query.to });
+  const costWeights = Object.fromEntries(Object.entries(MODES).filter(([, m]) => m.costWeight > 0).map(([k, m]) => [k, m.costWeight]));
+  res.json({
+    trips: totals.tickets - totals.cancelled,
+    multimodalTrips: totals.multiOperator,
+    standaloneRevenue: round(operators.reduce((s, o) => s + o.standalone, 0), 2),
+    integratedRevenue: totals.net,
+    commuterSavings: totals.savings,
+    passengerKm: round(operators.reduce((s, o) => s + o.passengerKm, 0), 1),
+    rules: {
+      integrationDiscountPct: Math.round(FARE_SHARE.integrationDiscount * 100),
+      fareWeightPct: Math.round(FARE_SHARE.fareWeight * 100),
+      costWeights,
+    },
+    operators: operators.map((o) => ({
+      operator: o.operator,
+      operatorName: o.operatorName,
+      mode: o.mode,
+      trips: o.tickets,
+      passengerKm: o.passengerKm,
+      standaloneRevenue: o.standalone,
+      settledRevenue: o.net,
+      revenueSharePct: o.sharePct,
+      vsStandalone: round(o.net - o.standalone, 2),
+    })),
+  });
 });
 
 export default router;

@@ -1,0 +1,1434 @@
+[
+  {
+    "id": "metro-thaltej-gam",
+    "name": "Thaltej Gam",
+    "mode": "metro",
+    "lat": 23.05018,
+    "lng": 72.50702,
+    "approx": false
+  },
+  {
+    "id": "metro-thaltej",
+    "name": "Thaltej",
+    "mode": "metro",
+    "lat": 23.04975,
+    "lng": 72.51599,
+    "approx": false
+  },
+  {
+    "id": "metro-doordarshan-kendra",
+    "name": "Doordarshan Kendra",
+    "mode": "metro",
+    "lat": 23.04814,
+    "lng": 72.5245,
+    "approx": false
+  },
+  {
+    "id": "metro-gurukul-road",
+    "name": "Gurukul Road",
+    "mode": "metro",
+    "lat": 23.04587,
+    "lng": 72.53488,
+    "approx": false
+  },
+  {
+    "id": "metro-gujarat-university",
+    "name": "Gujarat University",
+    "mode": "metro",
+    "lat": 23.04484,
+    "lng": 72.54351,
+    "approx": false
+  },
+  {
+    "id": "metro-commerce-six-road",
+    "name": "Commerce Six Road",
+    "mode": "metro",
+    "lat": 23.04068,
+    "lng": 72.55306,
+    "approx": false
+  },
+  {
+    "id": "metro-sp-stadium",
+    "name": "SP Stadium",
+    "mode": "metro",
+    "lat": 23.03984,
+    "lng": 72.56164,
+    "approx": false
+  },
+  {
+    "id": "metro-old-high-court",
+    "name": "Old High Court",
+    "mode": "metro",
+    "lat": 23.03754,
+    "lng": 72.56706,
+    "approx": false
+  },
+  {
+    "id": "metro-shahpur",
+    "name": "Shahpur",
+    "mode": "metro",
+    "lat": 23.03916,
+    "lng": 72.58103,
+    "approx": false
+  },
+  {
+    "id": "metro-gheekanta",
+    "name": "Gheekanta",
+    "mode": "metro",
+    "lat": 23.02878,
+    "lng": 72.58675,
+    "approx": false
+  },
+  {
+    "id": "metro-kalupur-railway-station",
+    "name": "Kalupur Railway Station",
+    "mode": "metro",
+    "lat": 23.02469,
+    "lng": 72.60309,
+    "approx": false
+  },
+  {
+    "id": "metro-kankaria-east",
+    "name": "Kankaria East",
+    "mode": "metro",
+    "lat": 23.01545,
+    "lng": 72.60694,
+    "approx": false
+  },
+  {
+    "id": "metro-apparel-park",
+    "name": "Apparel Park",
+    "mode": "metro",
+    "lat": 23.01066,
+    "lng": 72.61824,
+    "approx": false
+  },
+  {
+    "id": "metro-amraiwadi",
+    "name": "Amraiwadi",
+    "mode": "metro",
+    "lat": 23.00785,
+    "lng": 72.62837,
+    "approx": false
+  },
+  {
+    "id": "metro-rabari-colony",
+    "name": "Rabari Colony",
+    "mode": "metro",
+    "lat": 23.00541,
+    "lng": 72.63559,
+    "approx": false
+  },
+  {
+    "id": "metro-vastral",
+    "name": "Vastral",
+    "mode": "metro",
+    "lat": 23.00349,
+    "lng": 72.64769,
+    "approx": false
+  },
+  {
+    "id": "metro-nirant-cross-road",
+    "name": "Nirant Cross Road",
+    "mode": "metro",
+    "lat": 22.9999,
+    "lng": 72.65851,
+    "approx": false
+  },
+  {
+    "id": "metro-vastral-gam",
+    "name": "Vastral Gam",
+    "mode": "metro",
+    "lat": 22.99713,
+    "lng": 72.66745,
+    "approx": false
+  },
+  {
+    "id": "metro-motera-stadium",
+    "name": "Motera Stadium",
+    "mode": "metro",
+    "lat": 23.09676,
+    "lng": 72.59672,
+    "approx": false
+  },
+  {
+    "id": "metro-sabarmati",
+    "name": "Sabarmati",
+    "mode": "metro",
+    "lat": 23.08563,
+    "lng": 72.59222,
+    "approx": false
+  },
+  {
+    "id": "metro-aec",
+    "name": "AEC",
+    "mode": "metro",
+    "lat": 23.07509,
+    "lng": 72.59332,
+    "approx": false
+  },
+  {
+    "id": "metro-ranip",
+    "name": "Ranip",
+    "mode": "metro",
+    "lat": 23.06766,
+    "lng": 72.57415,
+    "approx": false
+  },
+  {
+    "id": "metro-vadaj",
+    "name": "Vadaj",
+    "mode": "metro",
+    "lat": 23.06765,
+    "lng": 72.56589,
+    "approx": false
+  },
+  {
+    "id": "metro-vijay-nagar",
+    "name": "Vijay Nagar",
+    "mode": "metro",
+    "lat": 23.05645,
+    "lng": 72.56233,
+    "approx": false
+  },
+  {
+    "id": "metro-usmanpura",
+    "name": "Usmanpura",
+    "mode": "metro",
+    "lat": 23.04594,
+    "lng": 72.565,
+    "approx": false
+  },
+  {
+    "id": "metro-gandhigram",
+    "name": "Gandhigram",
+    "mode": "metro",
+    "lat": 23.02717,
+    "lng": 72.5689,
+    "approx": false
+  },
+  {
+    "id": "metro-paldi",
+    "name": "Paldi",
+    "mode": "metro",
+    "lat": 23.01845,
+    "lng": 72.56238,
+    "approx": false
+  },
+  {
+    "id": "metro-shreyas",
+    "name": "Shreyas",
+    "mode": "metro",
+    "lat": 23.0136,
+    "lng": 72.54926,
+    "approx": false
+  },
+  {
+    "id": "metro-rajiv-nagar",
+    "name": "Rajiv Nagar",
+    "mode": "metro",
+    "lat": 23.00973,
+    "lng": 72.53676,
+    "approx": false
+  },
+  {
+    "id": "metro-jivraj-park",
+    "name": "Jivraj Park",
+    "mode": "metro",
+    "lat": 23.00555,
+    "lng": 72.5335,
+    "approx": false
+  },
+  {
+    "id": "metro-apmc",
+    "name": "APMC",
+    "mode": "metro",
+    "lat": 22.99782,
+    "lng": 72.53713,
+    "approx": false
+  },
+  {
+    "id": "metro-koteshwar-road",
+    "name": "Koteshwar Road",
+    "mode": "metro",
+    "lat": 23.10312,
+    "lng": 72.60211,
+    "approx": false
+  },
+  {
+    "id": "metro-vishwakarma-college",
+    "name": "Vishwakarma College",
+    "mode": "metro",
+    "lat": 23.11421,
+    "lng": 72.60838,
+    "approx": false
+  },
+  {
+    "id": "metro-tapovan-circle",
+    "name": "Tapovan Circle",
+    "mode": "metro",
+    "lat": 23.12014,
+    "lng": 72.61578,
+    "approx": false
+  },
+  {
+    "id": "metro-narmada-canal",
+    "name": "Narmada Canal",
+    "mode": "metro",
+    "lat": 23.12515,
+    "lng": 72.62209,
+    "approx": false
+  },
+  {
+    "id": "metro-koba-circle",
+    "name": "Koba Circle",
+    "mode": "metro",
+    "lat": 23.13226,
+    "lng": 72.63103,
+    "approx": false
+  },
+  {
+    "id": "metro-juna-koba",
+    "name": "Juna Koba",
+    "mode": "metro",
+    "lat": 23.142,
+    "lng": 72.63858,
+    "approx": false
+  },
+  {
+    "id": "metro-koba-gam",
+    "name": "Koba Gam",
+    "mode": "metro",
+    "lat": 23.14762,
+    "lng": 72.64388,
+    "approx": false
+  },
+  {
+    "id": "metro-gnlu",
+    "name": "GNLU",
+    "mode": "metro",
+    "lat": 23.15448,
+    "lng": 72.64745,
+    "approx": false
+  },
+  {
+    "id": "metro-raysan",
+    "name": "Raysan",
+    "mode": "metro",
+    "lat": 23.16639,
+    "lng": 72.64831,
+    "approx": false
+  },
+  {
+    "id": "metro-randesan",
+    "name": "Randesan",
+    "mode": "metro",
+    "lat": 23.17908,
+    "lng": 72.64726,
+    "approx": false
+  },
+  {
+    "id": "metro-dholakuva-circle",
+    "name": "Dholakuva Circle",
+    "mode": "metro",
+    "lat": 23.18593,
+    "lng": 72.64331,
+    "approx": false
+  },
+  {
+    "id": "metro-infocity",
+    "name": "Infocity",
+    "mode": "metro",
+    "lat": 23.19226,
+    "lng": 72.63969,
+    "approx": false
+  },
+  {
+    "id": "metro-sector-1",
+    "name": "Sector-1",
+    "mode": "metro",
+    "lat": 23.20491,
+    "lng": 72.64312,
+    "approx": false
+  },
+  {
+    "id": "metro-sector-10a",
+    "name": "Sector-10A",
+    "mode": "metro",
+    "lat": 23.21149,
+    "lng": 72.6502,
+    "approx": false
+  },
+  {
+    "id": "metro-sachivalaya",
+    "name": "Sachivalaya",
+    "mode": "metro",
+    "lat": 23.21507,
+    "lng": 72.65873,
+    "approx": false
+  },
+  {
+    "id": "metro-akshardham",
+    "name": "Akshardham",
+    "mode": "metro",
+    "lat": 23.22368,
+    "lng": 72.66417,
+    "approx": false
+  },
+  {
+    "id": "metro-juna-sachivalaya",
+    "name": "Juna Sachivalaya",
+    "mode": "metro",
+    "lat": 23.22891,
+    "lng": 72.65941,
+    "approx": false
+  },
+  {
+    "id": "metro-sector-16",
+    "name": "Sector-16",
+    "mode": "metro",
+    "lat": 23.23387,
+    "lng": 72.65016,
+    "approx": false
+  },
+  {
+    "id": "metro-sector-24",
+    "name": "Sector-24",
+    "mode": "metro",
+    "lat": 23.2385,
+    "lng": 72.64147,
+    "approx": false
+  },
+  {
+    "id": "metro-mahatma-mandir",
+    "name": "Mahatma Mandir",
+    "mode": "metro",
+    "lat": 23.23393,
+    "lng": 72.63389,
+    "approx": false
+  },
+  {
+    "id": "metro-pdeu",
+    "name": "PDEU",
+    "mode": "metro",
+    "lat": 23.15492,
+    "lng": 72.66123,
+    "approx": false
+  },
+  {
+    "id": "metro-gift-city",
+    "name": "GIFT City",
+    "mode": "metro",
+    "lat": 23.15335,
+    "lng": 72.68558,
+    "approx": false
+  },
+  {
+    "id": "brts-ghuma-gam",
+    "name": "Ghuma Gam",
+    "mode": "brts",
+    "lat": 23.03094,
+    "lng": 72.44833,
+    "approx": false
+  },
+  {
+    "id": "brts-bopal-gam",
+    "name": "Bopal Gam",
+    "mode": "brts",
+    "lat": 23.03401,
+    "lng": 72.46411,
+    "approx": false
+  },
+  {
+    "id": "brts-sterling-city",
+    "name": "Sterling City",
+    "mode": "brts",
+    "lat": 23.03232,
+    "lng": 72.46915,
+    "approx": false
+  },
+  {
+    "id": "brts-bopal-approach",
+    "name": "Bopal Approach",
+    "mode": "brts",
+    "lat": 23.02585,
+    "lng": 72.47791,
+    "approx": false
+  },
+  {
+    "id": "brts-south-bopal",
+    "name": "South Bopal",
+    "mode": "brts",
+    "lat": 23.0161,
+    "lng": 72.4656,
+    "approx": false
+  },
+  {
+    "id": "brts-ambli-gam",
+    "name": "Ambli Gam",
+    "mode": "brts",
+    "lat": 23.02646,
+    "lng": 72.48219,
+    "approx": false
+  },
+  {
+    "id": "brts-swagat-bungalows",
+    "name": "Swagat Bungalows",
+    "mode": "brts",
+    "lat": 23.02788,
+    "lng": 72.48588,
+    "approx": false
+  },
+  {
+    "id": "brts-jaintilal-park",
+    "name": "Jaintilal Park",
+    "mode": "brts",
+    "lat": 23.02842,
+    "lng": 72.49101,
+    "approx": false
+  },
+  {
+    "id": "brts-ashok-vatika",
+    "name": "Ashok Vatika",
+    "mode": "brts",
+    "lat": 23.02794,
+    "lng": 72.4957,
+    "approx": false
+  },
+  {
+    "id": "brts-antariksh-colony",
+    "name": "Antariksh Colony",
+    "mode": "brts",
+    "lat": 23.02776,
+    "lng": 72.50092,
+    "approx": false
+  },
+  {
+    "id": "brts-iskcon-cross-road",
+    "name": "Iskcon Cross Road",
+    "mode": "brts",
+    "lat": 23.02715,
+    "lng": 72.50852,
+    "approx": false
+  },
+  {
+    "id": "brts-ramdev-nagar",
+    "name": "Ramdev Nagar",
+    "mode": "brts",
+    "lat": 23.02752,
+    "lng": 72.51263,
+    "approx": false
+  },
+  {
+    "id": "brts-isro",
+    "name": "ISRO",
+    "mode": "brts",
+    "lat": 23.02769,
+    "lng": 72.51774,
+    "approx": false
+  },
+  {
+    "id": "brts-shivranjani",
+    "name": "Shivranjani",
+    "mode": "brts",
+    "lat": 23.0243,
+    "lng": 72.5313,
+    "approx": false
+  },
+  {
+    "id": "brts-jhansi-ki-rani",
+    "name": "Jhansi Ki Rani",
+    "mode": "brts",
+    "lat": 23.02303,
+    "lng": 72.53633,
+    "approx": false
+  },
+  {
+    "id": "brts-nehrunagar",
+    "name": "Nehrunagar",
+    "mode": "brts",
+    "lat": 23.02253,
+    "lng": 72.54169,
+    "approx": false
+  },
+  {
+    "id": "brts-manek-baug",
+    "name": "Manek Baug",
+    "mode": "brts",
+    "lat": 23.01831,
+    "lng": 72.54405,
+    "approx": false
+  },
+  {
+    "id": "brts-dharnidhar",
+    "name": "Dharnidhar",
+    "mode": "brts",
+    "lat": 23.00821,
+    "lng": 72.54928,
+    "approx": false
+  },
+  {
+    "id": "brts-anjali",
+    "name": "Anjali",
+    "mode": "brts",
+    "lat": 23.00372,
+    "lng": 72.55387,
+    "approx": false
+  },
+  {
+    "id": "brts-chandranagar",
+    "name": "Chandranagar",
+    "mode": "brts",
+    "lat": 22.99975,
+    "lng": 72.5581,
+    "approx": false
+  },
+  {
+    "id": "brts-national-cloth-factory",
+    "name": "National Cloth Factory",
+    "mode": "brts",
+    "lat": 22.99552,
+    "lng": 72.57021,
+    "approx": false
+  },
+  {
+    "id": "brts-danilimda",
+    "name": "Danilimda",
+    "mode": "brts",
+    "lat": 22.99649,
+    "lng": 72.5774,
+    "approx": false
+  },
+  {
+    "id": "brts-shah-alam",
+    "name": "Shah Alam",
+    "mode": "brts",
+    "lat": 22.99987,
+    "lng": 72.58297,
+    "approx": false
+  },
+  {
+    "id": "brts-meera-cinema",
+    "name": "Meera Cinema (Gokulnath Chowk)",
+    "mode": "brts",
+    "lat": 22.99909,
+    "lng": 72.59322,
+    "approx": false
+  },
+  {
+    "id": "brts-rambaug",
+    "name": "Rambaug",
+    "mode": "brts",
+    "lat": 22.99992,
+    "lng": 72.60067,
+    "approx": false
+  },
+  {
+    "id": "brts-maninagar",
+    "name": "Maninagar",
+    "mode": "brts",
+    "lat": 22.99724,
+    "lng": 72.60643,
+    "approx": false
+  },
+  {
+    "id": "brts-kankaria-telephone-exchange",
+    "name": "Kankaria Telephone Exchange",
+    "mode": "brts",
+    "lat": 23.00243,
+    "lng": 72.59284,
+    "approx": false
+  },
+  {
+    "id": "brts-geeta-mandir",
+    "name": "Geeta Mandir",
+    "mode": "brts",
+    "lat": 23.0152,
+    "lng": 72.59322,
+    "approx": true
+  },
+  {
+    "id": "brts-kalupur-railway-station",
+    "name": "Kalupur Railway Station",
+    "mode": "brts",
+    "lat": 23.02633,
+    "lng": 72.601,
+    "approx": true
+  },
+  {
+    "id": "brts-rto-circle",
+    "name": "RTO Circle",
+    "mode": "brts",
+    "lat": 23.06848,
+    "lng": 72.58089,
+    "approx": false
+  },
+  {
+    "id": "brts-bhavsar-hostel",
+    "name": "Bhavsar Hostel",
+    "mode": "brts",
+    "lat": 23.06767,
+    "lng": 72.57568,
+    "approx": false
+  },
+  {
+    "id": "brts-akhbarnagar",
+    "name": "Akhbarnagar",
+    "mode": "brts",
+    "lat": 23.06739,
+    "lng": 72.56259,
+    "approx": false
+  },
+  {
+    "id": "brts-pragatinagar",
+    "name": "Pragatinagar",
+    "mode": "brts",
+    "lat": 23.06466,
+    "lng": 72.55616,
+    "approx": true
+  },
+  {
+    "id": "brts-shastrinagar",
+    "name": "Shastrinagar",
+    "mode": "brts",
+    "lat": 23.06231,
+    "lng": 72.55304,
+    "approx": true
+  },
+  {
+    "id": "brts-sola-cross-road",
+    "name": "Sola Cross Road",
+    "mode": "brts",
+    "lat": 23.05272,
+    "lng": 72.5468,
+    "approx": false
+  },
+  {
+    "id": "brts-helmet-cross-road",
+    "name": "Helmet Cross Road",
+    "mode": "brts",
+    "lat": 23.04442,
+    "lng": 72.54229,
+    "approx": false
+  },
+  {
+    "id": "brts-iim",
+    "name": "IIM",
+    "mode": "brts",
+    "lat": 23.03463,
+    "lng": 72.53601,
+    "approx": false
+  },
+  {
+    "id": "brts-himmatlal-park",
+    "name": "Himmatlal Park",
+    "mode": "brts",
+    "lat": 23.02975,
+    "lng": 72.53241,
+    "approx": false
+  },
+  {
+    "id": "brts-narol",
+    "name": "Narol",
+    "mode": "brts",
+    "lat": 22.97298,
+    "lng": 72.5896,
+    "approx": false
+  },
+  {
+    "id": "brts-isanpur",
+    "name": "Isanpur",
+    "mode": "brts",
+    "lat": 22.97622,
+    "lng": 72.60238,
+    "approx": false
+  },
+  {
+    "id": "brts-ghodasar",
+    "name": "Ghodasar",
+    "mode": "brts",
+    "lat": 22.97852,
+    "lng": 72.61018,
+    "approx": false
+  },
+  {
+    "id": "brts-jashodanagar",
+    "name": "Jashodanagar",
+    "mode": "brts",
+    "lat": 22.98387,
+    "lng": 72.624,
+    "approx": false
+  },
+  {
+    "id": "brts-ctm",
+    "name": "CTM Cross Road",
+    "mode": "brts",
+    "lat": 22.99133,
+    "lng": 72.63177,
+    "approx": false
+  },
+  {
+    "id": "brts-rabari-colony",
+    "name": "Rabari Colony",
+    "mode": "brts",
+    "lat": 23.00438,
+    "lng": 72.6369,
+    "approx": false
+  },
+  {
+    "id": "brts-ram-rajya-nagar",
+    "name": "Ram Rajya Nagar",
+    "mode": "brts",
+    "lat": 23.00807,
+    "lng": 72.63813,
+    "approx": false
+  },
+  {
+    "id": "brts-rameshwar-park",
+    "name": "Rameshwar Park",
+    "mode": "brts",
+    "lat": 23.01366,
+    "lng": 72.63847,
+    "approx": false
+  },
+  {
+    "id": "brts-geeta-gauri-cinema",
+    "name": "Geeta Gauri Cinema",
+    "mode": "brts",
+    "lat": 23.01741,
+    "lng": 72.63845,
+    "approx": false
+  },
+  {
+    "id": "brts-soni-ni-chali",
+    "name": "Soni Ni Chali",
+    "mode": "brts",
+    "lat": 23.02055,
+    "lng": 72.63844,
+    "approx": false
+  },
+  {
+    "id": "brts-viratnagar",
+    "name": "Viratnagar",
+    "mode": "brts",
+    "lat": 23.02756,
+    "lng": 72.6388,
+    "approx": false
+  },
+  {
+    "id": "brts-bapunagar-approach",
+    "name": "Bapunagar Approach",
+    "mode": "brts",
+    "lat": 23.03262,
+    "lng": 72.63928,
+    "approx": false
+  },
+  {
+    "id": "brts-thakkarnagar-approach",
+    "name": "Thakkarnagar Approach",
+    "mode": "brts",
+    "lat": 23.04121,
+    "lng": 72.64055,
+    "approx": false
+  },
+  {
+    "id": "brts-hirawadi",
+    "name": "Hirawadi",
+    "mode": "brts",
+    "lat": 23.04567,
+    "lng": 72.641,
+    "approx": false
+  },
+  {
+    "id": "brts-vijay-park",
+    "name": "Vijay Park",
+    "mode": "brts",
+    "lat": 23.05139,
+    "lng": 72.64185,
+    "approx": false
+  },
+  {
+    "id": "brts-naroda-patiya",
+    "name": "Naroda Patiya (S.T. Workshop)",
+    "mode": "brts",
+    "lat": 23.06425,
+    "lng": 72.64297,
+    "approx": false
+  },
+  {
+    "id": "brts-naroda-gam",
+    "name": "Naroda Gam",
+    "mode": "brts",
+    "lat": 23.07711,
+    "lng": 72.65579,
+    "approx": false
+  },
+  {
+    "id": "brts-chhipa-society",
+    "name": "Chhipa Society",
+    "mode": "brts",
+    "lat": 22.99155,
+    "lng": 72.58167,
+    "approx": false
+  },
+  {
+    "id": "brts-chandola-lake",
+    "name": "Chandola Lake",
+    "mode": "brts",
+    "lat": 22.98649,
+    "lng": 72.58262,
+    "approx": false
+  },
+  {
+    "id": "brts-chandola-octroi-naka",
+    "name": "Chandola Octroi Naka",
+    "mode": "brts",
+    "lat": 22.98216,
+    "lng": 72.58571,
+    "approx": false
+  },
+  {
+    "id": "brts-kashiram-textiles",
+    "name": "Kashiram Textiles",
+    "mode": "brts",
+    "lat": 22.97687,
+    "lng": 72.58678,
+    "approx": false
+  },
+  {
+    "id": "amts-thaltej-gam",
+    "name": "Thaltej Gam",
+    "mode": "amts",
+    "lat": 23.05018,
+    "lng": 72.50702,
+    "approx": true
+  },
+  {
+    "id": "amts-surdhara-circle",
+    "name": "Surdhara Circle",
+    "mode": "amts",
+    "lat": 23.0528,
+    "lng": 72.52582,
+    "approx": false
+  },
+  {
+    "id": "amts-memnagar-gam",
+    "name": "Memnagar Gam",
+    "mode": "amts",
+    "lat": 23.0517,
+    "lng": 72.53517,
+    "approx": true
+  },
+  {
+    "id": "amts-vijay-char-rasta",
+    "name": "Vijay Char Rasta",
+    "mode": "amts",
+    "lat": 23.04264,
+    "lng": 72.5491,
+    "approx": false
+  },
+  {
+    "id": "amts-gujarat-university",
+    "name": "Gujarat University",
+    "mode": "amts",
+    "lat": 23.03731,
+    "lng": 72.54475,
+    "approx": true
+  },
+  {
+    "id": "amts-st-xaviers-college",
+    "name": "St. Xavier's College",
+    "mode": "amts",
+    "lat": 23.0315,
+    "lng": 72.55212,
+    "approx": true
+  },
+  {
+    "id": "amts-law-college",
+    "name": "Law College",
+    "mode": "amts",
+    "lat": 23.02591,
+    "lng": 72.55924,
+    "approx": true
+  },
+  {
+    "id": "amts-paldi",
+    "name": "Paldi",
+    "mode": "amts",
+    "lat": 23.01455,
+    "lng": 72.56354,
+    "approx": true
+  },
+  {
+    "id": "amts-sanskar-kendra",
+    "name": "Museum (Sanskar Kendra)",
+    "mode": "amts",
+    "lat": 23.01309,
+    "lng": 72.5694,
+    "approx": true
+  },
+  {
+    "id": "amts-geeta-mandir",
+    "name": "Geeta Mandir (S.T. Stand)",
+    "mode": "amts",
+    "lat": 23.0141,
+    "lng": 72.59246,
+    "approx": true
+  },
+  {
+    "id": "amts-sarangpur",
+    "name": "Sarangpur",
+    "mode": "amts",
+    "lat": 23.01978,
+    "lng": 72.59979,
+    "approx": true
+  },
+  {
+    "id": "amts-kalupur-terminus",
+    "name": "Kalupur Terminus",
+    "mode": "amts",
+    "lat": 23.03084,
+    "lng": 72.59794,
+    "approx": true
+  },
+  {
+    "id": "amts-krishnanagar",
+    "name": "Krishnanagar",
+    "mode": "amts",
+    "lat": 23.06008,
+    "lng": 72.64369,
+    "approx": false
+  },
+  {
+    "id": "amts-naroda-patiya",
+    "name": "Naroda Patiya (S.T. Workshop)",
+    "mode": "amts",
+    "lat": 23.06482,
+    "lng": 72.64297,
+    "approx": false
+  },
+  {
+    "id": "amts-naroda-gam",
+    "name": "Naroda Gam",
+    "mode": "amts",
+    "lat": 23.0771,
+    "lng": 72.65581,
+    "approx": false
+  },
+  {
+    "id": "amts-vatva-railway-station",
+    "name": "Vatva Railway Station",
+    "mode": "amts",
+    "lat": 22.959,
+    "lng": 72.6298,
+    "approx": true
+  },
+  {
+    "id": "amts-isanpur",
+    "name": "Isanpur",
+    "mode": "amts",
+    "lat": 22.98113,
+    "lng": 72.60129,
+    "approx": true
+  },
+  {
+    "id": "amts-jawahar-chowk",
+    "name": "Jawahar Chowk (Maninagar)",
+    "mode": "amts",
+    "lat": 22.99522,
+    "lng": 72.60418,
+    "approx": false
+  },
+  {
+    "id": "amts-shah-alam-tollnaka",
+    "name": "Shah Alam Tollnaka",
+    "mode": "amts",
+    "lat": 22.99417,
+    "lng": 72.58939,
+    "approx": true
+  },
+  {
+    "id": "amts-asarwa-chakla",
+    "name": "Asarwa Chakla",
+    "mode": "amts",
+    "lat": 23.04725,
+    "lng": 72.6088,
+    "approx": true
+  },
+  {
+    "id": "amts-civil-hospital",
+    "name": "Civil Hospital",
+    "mode": "amts",
+    "lat": 23.0523,
+    "lng": 72.60438,
+    "approx": true
+  },
+  {
+    "id": "amts-chandkheda",
+    "name": "Chandkheda",
+    "mode": "amts",
+    "lat": 23.11006,
+    "lng": 72.58112,
+    "approx": true
+  },
+  {
+    "id": "amts-ongc-office",
+    "name": "O.N.G.C. Office",
+    "mode": "amts",
+    "lat": 23.10364,
+    "lng": 72.58677,
+    "approx": true
+  },
+  {
+    "id": "amts-acher-depot",
+    "name": "Acher Depot",
+    "mode": "amts",
+    "lat": 23.09874,
+    "lng": 72.58831,
+    "approx": false
+  },
+  {
+    "id": "amts-ramnagar",
+    "name": "Ramnagar (Sabarmati)",
+    "mode": "amts",
+    "lat": 23.08333,
+    "lng": 72.5901,
+    "approx": false
+  },
+  {
+    "id": "amts-rto-circle",
+    "name": "RTO Circle",
+    "mode": "amts",
+    "lat": 23.06848,
+    "lng": 72.58089,
+    "approx": true
+  },
+  {
+    "id": "amts-ranip",
+    "name": "Ranip",
+    "mode": "amts",
+    "lat": 23.06838,
+    "lng": 72.57579,
+    "approx": false
+  },
+  {
+    "id": "amts-vadaj",
+    "name": "Vadaj",
+    "mode": "amts",
+    "lat": 23.05508,
+    "lng": 72.5711,
+    "approx": true
+  },
+  {
+    "id": "amts-usmanpura",
+    "name": "Usmanpura",
+    "mode": "amts",
+    "lat": 23.04949,
+    "lng": 72.56726,
+    "approx": true
+  },
+  {
+    "id": "amts-income-tax",
+    "name": "Income Tax",
+    "mode": "amts",
+    "lat": 23.04112,
+    "lng": 72.56937,
+    "approx": true
+  },
+  {
+    "id": "amts-lal-darwaja",
+    "name": "Lal Darwaja",
+    "mode": "amts",
+    "lat": 23.02419,
+    "lng": 72.57856,
+    "approx": false
+  },
+  {
+    "id": "amts-municipal-corporation-office",
+    "name": "Municipal Corporation Office",
+    "mode": "amts",
+    "lat": 23.01979,
+    "lng": 72.58604,
+    "approx": false
+  },
+  {
+    "id": "amts-rambaug",
+    "name": "Rambaug",
+    "mode": "amts",
+    "lat": 22.9982,
+    "lng": 72.59969,
+    "approx": true
+  },
+  {
+    "id": "amts-maninagar",
+    "name": "Maninagar",
+    "mode": "amts",
+    "lat": 22.99771,
+    "lng": 72.60672,
+    "approx": true
+  },
+  {
+    "id": "amts-naranpura",
+    "name": "Naranpura",
+    "mode": "amts",
+    "lat": 23.05671,
+    "lng": 72.55086,
+    "approx": true
+  },
+  {
+    "id": "amts-sahajanand-college",
+    "name": "Sahajanand College Cross Road",
+    "mode": "amts",
+    "lat": 23.02518,
+    "lng": 72.54316,
+    "approx": false
+  },
+  {
+    "id": "amts-shyamal-char-rasta",
+    "name": "Shyamal Char Rasta",
+    "mode": "amts",
+    "lat": 23.01465,
+    "lng": 72.53055,
+    "approx": false
+  },
+  {
+    "id": "amts-jivraj-park",
+    "name": "Jivraj Park",
+    "mode": "amts",
+    "lat": 23.00633,
+    "lng": 72.53652,
+    "approx": true
+  },
+  {
+    "id": "amts-vasna",
+    "name": "Vasna",
+    "mode": "amts",
+    "lat": 23.00214,
+    "lng": 72.5477,
+    "approx": false
+  },
+  {
+    "id": "amts-anjali",
+    "name": "Anjali",
+    "mode": "amts",
+    "lat": 23.00445,
+    "lng": 72.5531,
+    "approx": false
+  },
+  {
+    "id": "amts-gujarat-high-court",
+    "name": "Gujarat High Court",
+    "mode": "amts",
+    "lat": 23.08041,
+    "lng": 72.52336,
+    "approx": true
+  },
+  {
+    "id": "amts-sola-overbridge",
+    "name": "Sola Overbridge",
+    "mode": "amts",
+    "lat": 23.07217,
+    "lng": 72.52393,
+    "approx": true
+  },
+  {
+    "id": "amts-apmc",
+    "name": "APMC",
+    "mode": "amts",
+    "lat": 22.99717,
+    "lng": 72.53612,
+    "approx": true
+  },
+  {
+    "id": "amts-khokhra",
+    "name": "Khokhra",
+    "mode": "amts",
+    "lat": 23.00084,
+    "lng": 72.61863,
+    "approx": true
+  },
+  {
+    "id": "amts-hatkeshwar",
+    "name": "Hatkeshwar",
+    "mode": "amts",
+    "lat": 22.99933,
+    "lng": 72.62451,
+    "approx": true
+  },
+  {
+    "id": "amts-gandhigram",
+    "name": "Gandhigram",
+    "mode": "amts",
+    "lat": 23.02638,
+    "lng": 72.56889,
+    "approx": true
+  },
+  {
+    "id": "amts-town-hall",
+    "name": "Town Hall (Madalpur)",
+    "mode": "amts",
+    "lat": 23.02268,
+    "lng": 72.57073,
+    "approx": true
+  },
+  {
+    "id": "amts-shivranjani",
+    "name": "Shivranjani",
+    "mode": "amts",
+    "lat": 23.02428,
+    "lng": 72.5314,
+    "approx": false
+  },
+  {
+    "id": "amts-jodhpur",
+    "name": "Jodhpur",
+    "mode": "amts",
+    "lat": 23.01693,
+    "lng": 72.52043,
+    "approx": true
+  },
+  {
+    "id": "amts-anandnagar",
+    "name": "Anandnagar",
+    "mode": "amts",
+    "lat": 23.01107,
+    "lng": 72.51374,
+    "approx": true
+  },
+  {
+    "id": "amts-prahladnagar-garden",
+    "name": "Prahladnagar Garden",
+    "mode": "amts",
+    "lat": 23.013,
+    "lng": 72.50608,
+    "approx": true
+  },
+  {
+    "id": "amts-ymca-club",
+    "name": "YMCA Club",
+    "mode": "amts",
+    "lat": 23.0047,
+    "lng": 72.50175,
+    "approx": true
+  },
+  {
+    "id": "amts-mumatpura",
+    "name": "Mumatpura",
+    "mode": "amts",
+    "lat": 23.01849,
+    "lng": 72.49545,
+    "approx": true
+  },
+  {
+    "id": "amts-navrangpura",
+    "name": "Navrangpura",
+    "mode": "amts",
+    "lat": 23.03559,
+    "lng": 72.56419,
+    "approx": false
+  },
+  {
+    "id": "amts-prem-darwaja",
+    "name": "Prem Darwaja",
+    "mode": "amts",
+    "lat": 23.035,
+    "lng": 72.59689,
+    "approx": true
+  },
+  {
+    "id": "amts-kankaria-zoo",
+    "name": "Kankaria Zoo",
+    "mode": "amts",
+    "lat": 23.00816,
+    "lng": 72.60388,
+    "approx": true
+  },
+  {
+    "id": "amts-gomtipur",
+    "name": "Gomtipur",
+    "mode": "amts",
+    "lat": 23.0137,
+    "lng": 72.62058,
+    "approx": true
+  },
+  {
+    "id": "amts-vastrapur",
+    "name": "Vastrapur",
+    "mode": "amts",
+    "lat": 23.04009,
+    "lng": 72.52904,
+    "approx": true
+  },
+  {
+    "id": "amts-judges-bungalows",
+    "name": "Judges Bungalows",
+    "mode": "amts",
+    "lat": 23.03561,
+    "lng": 72.51895,
+    "approx": true
+  },
+  {
+    "id": "amts-pakwan-cross-road",
+    "name": "Pakwan Cross Road",
+    "mode": "amts",
+    "lat": 23.03875,
+    "lng": 72.51185,
+    "approx": false
+  },
+  {
+    "id": "amts-sindhu-bhavan",
+    "name": "Sindhu Bhavan",
+    "mode": "amts",
+    "lat": 23.0416,
+    "lng": 72.50176,
+    "approx": true
+  },
+  {
+    "id": "amts-viratnagar",
+    "name": "Viratnagar",
+    "mode": "amts",
+    "lat": 23.02694,
+    "lng": 72.63864,
+    "approx": true
+  },
+  {
+    "id": "amts-new-india-colony",
+    "name": "New India Colony",
+    "mode": "amts",
+    "lat": 23.06167,
+    "lng": 72.67218,
+    "approx": true
+  },
+  {
+    "id": "gsrtc-pathikashram",
+    "name": "Gandhinagar Pathikashram",
+    "mode": "gsrtc",
+    "lat": 23.21628,
+    "lng": 72.64266,
+    "approx": false
+  },
+  {
+    "id": "gsrtc-gift-city",
+    "name": "GIFT City",
+    "mode": "gsrtc",
+    "lat": 23.16291,
+    "lng": 72.68869,
+    "approx": true
+  },
+  {
+    "id": "gsrtc-narol",
+    "name": "Narol",
+    "mode": "gsrtc",
+    "lat": 22.97298,
+    "lng": 72.5896,
+    "approx": true
+  },
+  {
+    "id": "gsrtc-shantipura-circle",
+    "name": "Shantipura Circle (SG Highway)",
+    "mode": "gsrtc",
+    "lat": 22.98753,
+    "lng": 72.47135,
+    "approx": false
+  }
+]

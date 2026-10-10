@@ -84,9 +84,10 @@ export function checkLine(l, stopIds) {
     operator: l.operator || mode.operator,
     color: l.color || mode.color,
     stops: l.stops,
-    avgSpeedKmph: speed ?? mode.defaultSpeedKmph,
-    headwayMin: headway ?? mode.defaultHeadwayMin,
   };
+  // Left unset when unknown; the line then stays out of routing until both are entered.
+  if (speed !== undefined) out.avgSpeedKmph = speed;
+  if (headway !== undefined) out.headwayMin = headway;
   if (l.source) out.source = l.source;
   if (l.active === false) {
     out.active = false;

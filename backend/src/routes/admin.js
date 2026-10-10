@@ -5,17 +5,9 @@ import { dashboard } from '../services/admin/dashboard.js';
 import * as net from '../services/admin/network-edit.js';
 import { getSettings, updateSettings, resetSettings } from '../services/admin/settings.js';
 import { listTickets, getTicket, validateTicket, cancelTicket, revenueReport, verifyQr } from '../services/admin/tickets.js';
-import ticketRoutes from './tickets.js';
 
-/**
- * Admin API, mounted by index.js at /api/admin.
- *
- * It is a sub-app rather than a Router so that, on mount, it can also register
- * the public ticket endpoints (/api/tickets) on the parent app. That keeps the
- * index.js change to the single admin registration line.
- */
+/** Admin API, mounted by index.js at /api/admin. */
 const admin = express();
-admin.on('mount', (parent) => parent.use('/api', ticketRoutes));
 
 const int = (v, d) => (Number.isFinite(Number(v)) && v !== '' && v != null ? Math.max(0, Math.floor(Number(v))) : d);
 const str = (v) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);

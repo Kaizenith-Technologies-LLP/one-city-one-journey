@@ -1,0 +1,88 @@
+{
+  "metro": {
+    "currency": "INR",
+    "slabs": [
+      {
+        "uptoKm": 2,
+        "fare": 5
+      },
+      {
+        "uptoKm": 5,
+        "fare": 10
+      },
+      {
+        "uptoKm": 8,
+        "fare": 15
+      },
+      {
+        "uptoKm": 12,
+        "fare": 20
+      },
+      {
+        "uptoKm": 999,
+        "fare": 25
+      }
+    ],
+    "source": "https://www.metrofare.in/en/india/ahmedabad-metro/fare-calculator/"
+  },
+  "amts": {
+    "currency": "INR",
+    "slabs": [
+      {
+        "uptoKm": 3,
+        "fare": 5
+      },
+      {
+        "uptoKm": 5,
+        "fare": 10
+      },
+      {
+        "uptoKm": 8,
+        "fare": 15
+      },
+      {
+        "uptoKm": 14,
+        "fare": 20
+      },
+      {
+        "uptoKm": 20,
+        "fare": 25
+      },
+      {
+        "uptoKm": 999,
+        "fare": 30
+      }
+    ],
+    "source": "https://deshgujarat.com/2023/06/23/hike-in-amts-bus-ticket-prices/"
+  },
+  "gmcbus": {
+    "currency": "INR",
+    "slabs": [
+      {
+        "uptoKm": 3,
+        "fare": 5
+      },
+      {
+        "uptoKm": 5,
+        "fare": 10
+      },
+      {
+        "uptoKm": 8,
+        "fare": 15
+      },
+      {
+        "uptoKm": 14,
+        "fare": 20
+      },
+      {
+        "uptoKm": 20,
+        "fare": 25
+      },
+      {
+        "uptoKm": 999,
+        "fare": 30
+      }
+    ],
+    "source": "https://ianslive.in/gujarat-hm-amit-shah-flags-off-pm-ebus-sewa-in-gandhinagar-40-electric-buses-begin-operations--20260628202305"
+  }
+}

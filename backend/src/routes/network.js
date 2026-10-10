@@ -27,6 +27,7 @@ router.get('/meta', (_req, res) => {
     region: 'Ahmedabad + Gandhinagar',
     modes,
     counts: { stops: stops.length, lines: lines.length, hubs: hubs.length, corridorOverlaps: overlaps.length },
+    unroutableLines: network.unroutable,
     bounds: {
       south: Math.min(...stops.map((s) => s.lat)),
       west: Math.min(...stops.map((s) => s.lng)),

@@ -53,6 +53,5 @@ class Api {
     return list.map((e) => Hub.fromJson(e)).toList();
   }
 
-  Future<Settlement> settlement({int trips = 300}) async =>
-      Settlement.fromJson(await _get('/settlement', {'trips': '$trips'}));
+  Future<Settlement> settlement() async => Settlement.fromJson(await _get('/settlement'));
 }

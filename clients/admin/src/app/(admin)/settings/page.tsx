@@ -6,7 +6,7 @@ import type { Mode, Settings } from "@/lib/types";
 import { inr, MODE_KEYS, modeColor, MODES } from "@/lib/modes";
 import { Alert, Button, Card, Field, PageHeader, useLoad, useToast } from "@/components/ui";
 
-type Form = { discountPct: number; fareWeightPct: number; costWeights: Record<Mode, number> };
+type Form = { discountPct: number; fareWeightPct: number; costWeights: Partial<Record<Mode, number>> };
 
 // Example trip for the live preview: Metro then BRTS.
 const SAMPLE = [
@@ -18,13 +18,16 @@ const SAMPLE = [
 function preview(f: Form) {
   const standalone = SAMPLE.reduce((s, t) => s + t.fare, 0);
   const integrated = Math.round(standalone * (1 - f.discountPct / 100));
-  const fw = f.fareWeightPct / 100;
-  const totalW = SAMPLE.reduce((s, t) => s + t.km * f.costWeights[t.mode], 0) || 1;
+  // Without a cost weight for every operator the backend splits on standalone fares only.
+  const useKm = SAMPLE.every((t) => (f.costWeights[t.mode] ?? 0) > 0);
+  const fw = useKm ? f.fareWeightPct / 100 : 1;
+  const weight = (t: (typeof SAMPLE)[number]) => t.km * (f.costWeights[t.mode] ?? 0);
+  const totalW = SAMPLE.reduce((s, t) => s + weight(t), 0) || 1;
   return {
     standalone,
     integrated,
     shares: SAMPLE.map((t) => {
-      const pct = fw * (t.fare / standalone) + (1 - fw) * ((t.km * f.costWeights[t.mode]) / totalW);
+      const pct = fw * (t.fare / standalone) + (1 - fw) * (weight(t) / totalW);
       return { ...t, pct: pct * 100, amount: integrated * pct };
     }),
   };
@@ -106,10 +109,15 @@ export default function SettingsPage() {
                         step={0.1}
                         min={0.1}
                         max={5}
-                        value={form.costWeights[m]}
-                        onChange={(e) => setForm({ ...form, costWeights: { ...form.costWeights, [m]: Number(e.target.value) } })}
+                        placeholder="not set"
+                        value={form.costWeights[m] ?? ""}
+                        onChange={(e) => {
+                          const next = { ...form.costWeights };
+                          if (e.target.value === "") delete next[m];
+                          else next[m] = Number(e.target.value);
+                          setForm({ ...form, costWeights: next });
+                        }}
                       />
-                      <span className="mt-1 block text-[11px] text-slate-400">default {data.defaults.costWeights[m]}</span>
                     </label>
                   ))}
                 </div>

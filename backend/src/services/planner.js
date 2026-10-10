@@ -69,8 +69,9 @@ export class Planner {
     this.network = network;
     this.stopToHub = stopToHub;
     this.walkLinks = this.#buildWalkLinks();
+    // Only routable lines are in the network, and each has fare slabs for its mode.
     this.perKm = {};
-    for (const mode of Object.keys(MODES)) this.perKm[mode] = this.#estimatePerKm(mode);
+    for (const line of network.lines.values()) this.perKm[line.mode] ??= this.#estimatePerKm(line.mode);
   }
 
   /** Stops reachable on foot from each stop: anything within 500 m, plus every other member of its hub. */
@@ -93,9 +94,10 @@ export class Planner {
     return links;
   }
 
+  /** Average fare increase per km across a mode's finite slabs; a routing weight, not a price. */
   #estimatePerKm(mode) {
-    const slabs = this.network.fares[mode]?.slabs?.filter((s) => s.uptoKm < 999);
-    if (!slabs?.length) return 1.5;
+    const slabs = this.network.fares[mode].slabs.filter((s) => s.uptoKm < 999);
+    if (slabs.length < 2) return 0;
     const last = slabs[slabs.length - 1];
     return Math.max(0.2, (last.fare - slabs[0].fare) / Math.max(1, last.uptoKm));
   }

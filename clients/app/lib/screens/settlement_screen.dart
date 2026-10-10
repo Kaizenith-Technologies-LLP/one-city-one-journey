@@ -4,7 +4,7 @@ import '../api.dart';
 import '../models.dart';
 import '../theme.dart';
 
-/// Simulated day of integrated tickets and what each operator receives.
+/// Issued integrated tickets and what each operator receives.
 class SettlementScreen extends StatefulWidget {
   const SettlementScreen({super.key});
 
@@ -47,12 +47,13 @@ class _SettlementScreenState extends State<SettlementScreen> {
                   ),
                 ),
               );
+          final weights = s.costWeights.entries.map((e) => '${modeStyle(e.key).label} ${e.value}').join(', ');
           return ListView(padding: const EdgeInsets.all(12), children: [
-            Text('One integrated ticket per journey. Revenue is settled between operators by a transparent rule.',
+            Text('One integrated ticket per journey. Revenue from issued tickets is settled between operators by a transparent rule.',
                 style: TextStyle(color: scheme.onSurfaceVariant)),
             const SizedBox(height: 12),
             Row(children: [
-              stat('${s.trips}', 'simulated trips'),
+              stat('${s.trips}', 'tickets issued'),
               const SizedBox(width: 8),
               stat('${s.multimodalTrips}', 'used 2+ operators'),
             ]),
@@ -65,6 +66,11 @@ class _SettlementScreenState extends State<SettlementScreen> {
             const SizedBox(height: 16),
             Text('Settlement per operator', style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
+            if (s.operators.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text('No tickets issued yet.', textAlign: TextAlign.center, style: TextStyle(color: scheme.onSurfaceVariant)),
+              ),
             ...s.operators.map((o) => _OperatorRow(o: o, maxRevenue: maxRevenue)),
             const SizedBox(height: 16),
             Card(
@@ -73,10 +79,9 @@ class _SettlementScreenState extends State<SettlementScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('How the split works', style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 6),
-                  const Text('1. Each leg is priced on its operator\'s own fare slabs.\n'
-                      '2. Journeys using 2+ operators get a 10% integration discount.\n'
-                      '3. The integrated fare is split 50% by each operator\'s standalone fare and '
-                      '50% by passenger-km weighted by operating cost (Metro 1.4, BRTS 1.0, GSRTC 0.9, AMTS 0.8).'),
+                  Text('1. Each leg is priced on its operator\'s own fare slabs.\n'
+                      '2. Journeys using 2+ operators get a ${s.integrationDiscountPct}% integration discount.\n'
+                      '3. ${weights.isEmpty ? 'The integrated fare is split by each operator\'s standalone fare (operating cost weights not configured yet).' : 'The integrated fare is split ${s.fareWeightPct}% by each operator\'s standalone fare and ${100 - s.fareWeightPct}% by passenger-km weighted by operating cost ($weights).'}'),
                 ]),
               ),
             ),

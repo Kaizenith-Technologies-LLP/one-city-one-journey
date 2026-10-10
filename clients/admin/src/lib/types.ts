@@ -27,8 +27,8 @@ export type Line = {
   operator: string;
   color: string;
   stops: string[];
-  avgSpeedKmph: number;
-  headwayMin: number;
+  avgSpeedKmph: number | null;
+  headwayMin: number | null;
   active: boolean;
   suspendedReason?: string;
   suspendedAt?: string;
@@ -47,9 +47,9 @@ export type FareTable = Record<Mode, { label: string; operator: string; color: s
 export type Settings = {
   integrationDiscount: number;
   fareWeight: number;
-  costWeights: Record<Mode, number>;
+  costWeights: Partial<Record<Mode, number>>;
   modes: Record<Mode, { label: string; operator: string; color: string }>;
-  defaults: { integrationDiscount: number; fareWeight: number; costWeights: Record<Mode, number> };
+  defaults: { integrationDiscount: number; fareWeight: number; costWeights: Partial<Record<Mode, number>> };
 };
 
 export type TicketStatus = "active" | "used" | "cancelled" | "expired";

@@ -25,11 +25,22 @@ export function loadNetwork() {
 
   const stops = new Map(stopList.map((s) => [s.id, { ...s, lines: [] }]));
   const lines = new Map();
+  // Lines left out of routing because the data lacks a value we would otherwise have to invent.
+  const unroutable = [];
 
   for (const raw of lineList) {
     if (raw.active === false) continue; // suspended by an admin: not routable
     const mode = MODES[raw.mode];
     if (!mode) throw new Error(`Line ${raw.id} has unknown mode ${raw.mode}`);
+    const missing = [
+      !(raw.avgSpeedKmph > 0) && 'avgSpeedKmph',
+      !(raw.headwayMin > 0) && 'headwayMin',
+      !fares[raw.mode]?.slabs?.length && `fares.${raw.mode}`,
+    ].filter(Boolean);
+    if (missing.length) {
+      unroutable.push({ id: raw.id, name: raw.name, mode: raw.mode, missing });
+      continue;
+    }
     const stopIds = raw.stops.filter((id) => stops.has(id));
     // Cumulative distance along the line, so any ride's km is a subtraction.
     const cumKm = [0];
@@ -44,14 +55,12 @@ export function loadNetwork() {
       lengthKm: cumKm[cumKm.length - 1],
       operator: raw.operator ?? mode.operator,
       color: raw.color ?? mode.color,
-      avgSpeedKmph: raw.avgSpeedKmph ?? mode.defaultSpeedKmph,
-      headwayMin: raw.headwayMin ?? mode.defaultHeadwayMin,
     };
     lines.set(line.id, line);
     stopIds.forEach((id, idx) => stops.get(id).lines.push({ lineId: line.id, idx }));
   }
 
-  return { stops, lines, fares };
+  return { stops, lines, fares, unroutable };
 }
 
 export function stopSummary(stop) {

@@ -353,6 +353,9 @@ class Settlement {
   final double integratedRevenue;
   final double commuterSavings;
   final double passengerKm;
+  final int integrationDiscountPct;
+  final int fareWeightPct;
+  final Map<String, double> costWeights;
   final List<OperatorSettlement> operators;
 
   const Settlement({
@@ -362,16 +365,25 @@ class Settlement {
     required this.integratedRevenue,
     required this.commuterSavings,
     required this.passengerKm,
+    required this.integrationDiscountPct,
+    required this.fareWeightPct,
+    required this.costWeights,
     required this.operators,
   });
 
-  factory Settlement.fromJson(Map<String, dynamic> j) => Settlement(
-        trips: _i(j['trips']),
-        multimodalTrips: _i(j['multimodalTrips']),
-        standaloneRevenue: _d(j['standaloneRevenue']),
-        integratedRevenue: _d(j['integratedRevenue']),
-        commuterSavings: _d(j['commuterSavings']),
-        passengerKm: _d(j['passengerKm']),
-        operators: (j['operators'] as List).map((e) => OperatorSettlement.fromJson(e)).toList(),
-      );
+  factory Settlement.fromJson(Map<String, dynamic> j) {
+    final rules = j['rules'] as Map<String, dynamic>? ?? const {};
+    return Settlement(
+      trips: _i(j['trips']),
+      multimodalTrips: _i(j['multimodalTrips']),
+      standaloneRevenue: _d(j['standaloneRevenue']),
+      integratedRevenue: _d(j['integratedRevenue']),
+      commuterSavings: _d(j['commuterSavings']),
+      passengerKm: _d(j['passengerKm']),
+      integrationDiscountPct: _i(rules['integrationDiscountPct']),
+      fareWeightPct: _i(rules['fareWeightPct']),
+      costWeights: (rules['costWeights'] as Map<String, dynamic>? ?? const {}).map((k, v) => MapEntry(k, _d(v))),
+      operators: (j['operators'] as List).map((e) => OperatorSettlement.fromJson(e)).toList(),
+    );
+  }
 }

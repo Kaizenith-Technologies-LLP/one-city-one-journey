@@ -12,7 +12,7 @@ export function initState() {
     const { hubs, stopToHub, links } = detectHubs(network);
     const overlaps = detectCorridorOverlaps(network, stopToHub);
     const planner = new Planner(network, stopToHub);
-    state = { network, hubs, hubById: new Map(hubs.map((h) => [h.id, h])), stopToHub, links, overlaps, planner, settlementCache: new Map() };
+    state = { network, hubs, hubById: new Map(hubs.map((h) => [h.id, h])), stopToHub, links, overlaps, planner };
     loadError = null;
   } catch (err) {
     state = null;
