@@ -26,7 +26,6 @@
       "metro-nirant-cross-road",
       "metro-vastral-gam"
     ],
-    "avgSpeedKmph": 33,
     "headwayMin": 12,
     "source": "https://www.openstreetmap.org/relation/9521935"
   },
@@ -53,7 +52,6 @@
       "metro-jivraj-park",
       "metro-apmc"
     ],
-    "avgSpeedKmph": 33,
     "headwayMin": 12,
     "source": "https://www.openstreetmap.org/relation/14658372"
   },
@@ -87,7 +85,6 @@
       "metro-sector-24",
       "metro-mahatma-mandir"
     ],
-    "avgSpeedKmph": 33,
     "source": "https://www.openstreetmap.org/relation/18391195"
   },
   {
@@ -102,7 +99,6 @@
       "metro-pdeu",
       "metro-gift-city"
     ],
-    "avgSpeedKmph": 33,
     "source": "https://www.openstreetmap.org/relation/18084556"
   },
   {
@@ -139,7 +135,6 @@
       "brts-rambaug",
       "brts-maninagar"
     ],
-    "avgSpeedKmph": 22,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -173,7 +168,6 @@
       "brts-rambaug",
       "brts-maninagar"
     ],
-    "avgSpeedKmph": 22,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -202,7 +196,6 @@
       "brts-naroda-patiya",
       "brts-naroda-gam"
     ],
-    "avgSpeedKmph": 22,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -225,7 +218,6 @@
       "brts-kashiram-textiles",
       "brts-narol"
     ],
-    "avgSpeedKmph": 21,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -250,7 +242,6 @@
       "brts-bhavsar-hostel",
       "brts-rto-circle"
     ],
-    "avgSpeedKmph": 22,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -275,7 +266,6 @@
       "brts-bopal-approach",
       "brts-south-bopal"
     ],
-    "avgSpeedKmph": 22,
     "source": "https://en.wikipedia.org/wiki/Ahmedabad_Bus_Rapid_Transit_System"
   },
   {
@@ -302,7 +292,6 @@
       "amts-naroda-patiya",
       "amts-naroda-gam"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-58"
   },
   {
@@ -323,7 +312,6 @@
       "amts-asarwa-chakla",
       "amts-civil-hospital"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-96"
   },
   {
@@ -350,7 +338,6 @@
       "amts-rambaug",
       "amts-maninagar"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-75"
   },
   {
@@ -376,7 +363,6 @@
       "amts-rambaug",
       "amts-maninagar"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-300"
   },
   {
@@ -404,7 +390,6 @@
       "amts-khokhra",
       "amts-hatkeshwar"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-160"
   },
   {
@@ -426,7 +411,6 @@
       "amts-ymca-club",
       "amts-mumatpura"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-45"
   },
   {
@@ -447,7 +431,6 @@
       "amts-kankaria-zoo",
       "amts-gomtipur"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-144"
   },
   {
@@ -463,7 +446,6 @@
       "amts-pakwan-cross-road",
       "amts-sindhu-bhavan"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-43"
   },
   {
@@ -478,7 +460,6 @@
       "amts-viratnagar",
       "amts-new-india-colony"
     ],
-    "avgSpeedKmph": 16,
     "source": "https://yometro.com/buses/amts-bus-route-136"
   },
   {
@@ -492,7 +473,6 @@
       "gsrtc-pathikashram",
       "gsrtc-gift-city"
     ],
-    "avgSpeedKmph": 25,
     "source": "https://www.sustainable-bus.com/electric-bus/gsrtc-electric-bus-lines-kick-off-to-connect-gift-city"
   },
   {
@@ -506,7 +486,6 @@
       "gsrtc-narol",
       "gsrtc-gift-city"
     ],
-    "avgSpeedKmph": 25,
     "source": "https://www.sustainable-bus.com/electric-bus/gsrtc-electric-bus-lines-kick-off-to-connect-gift-city"
   },
   {
@@ -520,7 +499,6 @@
       "gsrtc-shantipura-circle",
       "gsrtc-gift-city"
     ],
-    "avgSpeedKmph": 25,
     "source": "https://www.sustainable-bus.com/electric-bus/gsrtc-electric-bus-lines-kick-off-to-connect-gift-city"
   }
 ]

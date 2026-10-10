@@ -1,0 +1,185 @@
+{
+  "metro-blue": {
+    "source": "https://www.gujaratmetrorail.com/wp-content/uploads/2026/05/Revised-Time-Table-on-18.05.2026updated.jpg",
+    "note": "GMRC Line-1 (EW corridor) card w.e.f. 18.05.2026: first train 06:20 and last train 23:00 from both Thaltej Gam and Vastral Gam; travel time 45 min for 21.1 km (full line, same as our stop sequence). Frequency: weekday peak (08:00-11:00, 17:00-20:00) 7 min; weekday non-peak and Saturday peak 10 min; Saturday non-peak and Sunday full day 12 min; all days 06:20-07:00 and 22:00-23:00 20 min. 'Weekdays' read as Mon-Fri because Saturday is listed separately; Saturday peak hours taken as the same peak windows the card defines.",
+    "serviceStart": "06:20",
+    "serviceEnd": "23:00",
+    "runTimeMin": 45,
+    "bands": [
+      { "from": "06:20", "to": "07:00", "headwayMin": 20 },
+      { "from": "07:00", "to": "08:00", "headwayMin": 10, "days": ["mon", "tue", "wed", "thu", "fri"] },
+      { "from": "08:00", "to": "11:00", "headwayMin": 7, "days": ["mon", "tue", "wed", "thu", "fri"] },
+      { "from": "11:00", "to": "17:00", "headwayMin": 10, "days": ["mon", "tue", "wed", "thu", "fri"] },
+      { "from": "17:00", "to": "20:00", "headwayMin": 7, "days": ["mon", "tue", "wed", "thu", "fri"] },
+      { "from": "20:00", "to": "22:00", "headwayMin": 10, "days": ["mon", "tue", "wed", "thu", "fri"] },
+      { "from": "07:00", "to": "08:00", "headwayMin": 12, "days": ["sat"] },
+      { "from": "08:00", "to": "11:00", "headwayMin": 10, "days": ["sat"] },
+      { "from": "11:00", "to": "17:00", "headwayMin": 12, "days": ["sat"] },
+      { "from": "17:00", "to": "20:00", "headwayMin": 10, "days": ["sat"] },
+      { "from": "20:00", "to": "22:00", "headwayMin": 12, "days": ["sat"] },
+      { "from": "07:00", "to": "22:00", "headwayMin": 12, "days": ["sun"] },
+      { "from": "22:00", "to": "23:00", "headwayMin": 20 }
+    ]
+  },
+  "metro-red": {
+    "source": "https://www.gujaratmetrorail.com/wp-content/uploads/2026/05/Revised-Time-Table-on-18.05.2026updated.jpg",
+    "note": "GMRC Line-2 (NS corridor, APMC - Koteshwar Road) card w.e.f. 18.05.2026: Mon-Sun every 12 min 06:16-22:00 and every 20 min 22:00-23:00; first/last train 06:16/23:00 from Koteshwar Road and 06:20/23:10 from APMC; 35 min for 20.2 km. Our sequence starts at Motera Stadium, one station after Koteshwar Road. Motera times are derived by adding the 3 min Koteshwar Road -> Motera Stadium running time shown in every trip of the GMRC trip timetable (https://www.gujaratmetrorail.com/wp-content/uploads/2026/04/Tentative-TT-18.05.26.pdf): 06:16+3 = 06:19, 23:00+3 = 23:03. runTimeMin 32 = Motera Stadium -> APMC in that trip timetable (31-32 min across trips; consistent with 35 - 3). Reverse APMC -> Motera Stadium takes 32-33 min there; 33 used. Band edges kept at the card's 22:00 boundary.",
+    "serviceStart": "06:19",
+    "serviceEnd": "23:03",
+    "runTimeMin": 32,
+    "bands": [
+      { "from": "06:19", "to": "22:00", "headwayMin": 12 },
+      { "from": "22:00", "to": "23:03", "headwayMin": 20 }
+    ],
+    "reverse": {
+      "serviceStart": "06:20",
+      "serviceEnd": "23:10",
+      "runTimeMin": 33,
+      "bands": [
+        { "from": "06:20", "to": "22:00", "headwayMin": 12 },
+        { "from": "22:00", "to": "23:10", "headwayMin": 20 }
+      ]
+    }
+  },
+  "metro-yellow": {
+    "source": "https://www.gujaratmetrorail.com/wp-content/uploads/2026/04/Tentative-TT-18.05.26.pdf",
+    "note": "GMRC 'Ahmedabad - Gandhinagar Metro Rail Services (w.e.f 18 May 2026)' trip timetable: through trains APMC - Motera Stadium - Mahatma Mandir. Departures are the Motera Stadium times of trains that run to Mahatma Mandir; the 8 trains that branch at GNLU to GIFT City (highlighted rows) are excluded here although they also serve Motera Stadium - GNLU. Motera Stadium -> Mahatma Mandir is 46 min in every trip. Reverse: Mahatma Mandir departures of trains that reach Motera Stadium; 48-51 min, longest (51) used. The GMRC card (https://www.gujaratmetrorail.com/wp-content/uploads/2026/05/Revised-Time-Table-on-18.05.2026updated.jpg) gives Line-3 Koteshwar Road - Mahatma Mandir as 43 min / 20.87 km, first 06:55 / last 21:20 from Koteshwar Road and 06:40 / 21:00 from Mahatma Mandir, Mon-Sun, which matches this timetable.",
+    "serviceStart": "06:52",
+    "serviceEnd": "21:17",
+    "runTimeMin": 46,
+    "departures": [
+      "06:52", "07:30", "07:55", "08:19", "08:49", "09:05", "09:31", "09:51", "10:20", "10:44",
+      "11:08", "11:32", "11:57", "12:21", "12:45", "13:09", "13:34", "13:59", "14:22", "14:47",
+      "15:12", "15:36", "16:00", "16:25", "16:49", "17:13", "17:38", "18:02", "18:26", "18:50",
+      "19:15", "19:40", "20:14", "21:17"
+    ],
+    "reverse": {
+      "serviceStart": "06:40",
+      "serviceEnd": "21:00",
+      "runTimeMin": 51,
+      "departures": [
+        "06:40", "07:33", "08:00", "08:25", "08:49", "09:13", "09:37", "10:01", "10:26", "10:50",
+        "11:14", "11:38", "12:03", "12:26", "12:51", "13:15", "13:40", "14:04", "14:28", "14:52",
+        "15:16", "15:41", "16:06", "16:30", "16:54", "17:19", "17:44", "18:08", "18:32", "18:56",
+        "19:20", "19:44", "20:09", "21:00"
+      ]
+    }
+  },
+  "metro-violet": {
+    "source": "https://www.gujaratmetrorail.com/wp-content/uploads/2026/04/Tentative-TT-18.05.26.pdf",
+    "note": "GNLU and GIFT City departures from the GMRC trip timetable w.e.f. 18 May 2026 (highlighted GIFT City rows). The GMRC card (https://www.gujaratmetrorail.com/wp-content/uploads/2026/05/Revised-Time-Table-on-18.05.2026updated.jpg) gives Line-4 GNLU - GIFT City as 6 min / 5.8 km, first 07:36 / last 18:57 from GNLU and 07:48 / 19:13 from GIFT City, and says that only bus services run GNLU - GIFT City between 10:18 and 16:06. Forward run time is the card's 6 min (one trip in the timetable takes 7). Every reverse trip in the timetable takes 7 min.",
+    "serviceStart": "07:36",
+    "serviceEnd": "18:57",
+    "runTimeMin": 6,
+    "departures": ["07:36", "08:24", "08:54", "10:01", "16:06", "16:53", "18:06", "18:57"],
+    "reverse": {
+      "serviceStart": "07:48",
+      "serviceEnd": "19:13",
+      "runTimeMin": 7,
+      "departures": ["07:48", "08:37", "09:01", "10:18", "16:17", "17:08", "18:21", "19:13"]
+    }
+  },
+  "gsrtc-pathikashram-gift": {
+    "source": "https://crm.giftgujarat.in/uploads/gsrtc.pdf",
+    "note": "GIFT City 'GSRTC Bus Time Table' (file last modified 2025-08-07). Per that sheet the GSRTC electric services do not run on 2nd and 4th Saturdays or on Sundays; schedules.json has no field for this, so these departures are not day-restricted here. Forward = Gandhinagar Pathikashram -> GIFT City, all trips 20 min (double-decker and standard). Reverse = GIFT City -> Pathikashram: 20-35 min, longest (35) used. Three buses leave GIFT City at 09:30; that time is listed once.",
+    "serviceStart": "08:50",
+    "serviceEnd": "18:20",
+    "runTimeMin": 20,
+    "departures": ["08:50", "09:00", "13:00", "15:30", "18:20"],
+    "reverse": {
+      "serviceStart": "09:00",
+      "serviceEnd": "18:30",
+      "runTimeMin": 35,
+      "departures": ["09:00", "09:20", "09:25", "09:30", "09:40", "12:30", "13:30", "16:00", "18:15", "18:30"]
+    }
+  },
+  "gsrtc-narol-gift": {
+    "source": "https://crm.giftgujarat.in/uploads/gsrtc.pdf",
+    "note": "GIFT City 'GSRTC Bus Time Table' (file last modified 2025-08-07). Not run on 2nd and 4th Saturdays or on Sundays (not expressible here). Forward Narol -> GIFT City: 08:10 arrives 09:20 (70 min), 09:00 arrives 10:00 (60 min); longest (70) used. Reverse GIFT City -> Narol: 75 min on each trip with a published arrival (the 18:00 trip has none). Two buses leave GIFT City at 18:30; listed once.",
+    "serviceStart": "08:10",
+    "serviceEnd": "09:00",
+    "runTimeMin": 70,
+    "departures": ["08:10", "09:00"],
+    "reverse": {
+      "serviceStart": "18:00",
+      "serviceEnd": "19:15",
+      "runTimeMin": 75,
+      "departures": ["18:00", "18:15", "18:30", "19:15"]
+    }
+  },
+  "gsrtc-shantipura-gift": {
+    "source": "https://crm.giftgujarat.in/uploads/gsrtc.pdf",
+    "note": "GIFT City 'GSRTC Bus Time Table' (file last modified 2025-08-07). Not run on 2nd and 4th Saturdays or on Sundays (not expressible here). Only trips that start at or end at Shantipura are included; the Sarkhej (Ujala Chokdi) trips on the same corridor are excluded. Forward Shantipura -> GIFT City: 08:00 arrives 09:20 (80 min), 09:00 arrives 10:00 (60 min), 08:30 has no arrival time; longest (80) used. Reverse GIFT City -> Shantipura: 60, 85 and 90 min; longest (90) used.",
+    "serviceStart": "08:00",
+    "serviceEnd": "09:00",
+    "runTimeMin": 80,
+    "departures": ["08:00", "08:30", "09:00"],
+    "reverse": {
+      "serviceStart": "17:30",
+      "serviceEnd": "18:30",
+      "runTimeMin": 90,
+      "departures": ["17:30", "18:15", "18:30"]
+    }
+  },
+  "amts-58": {
+    "source": "http://web.archive.org/web/20240704004606/https://www.amts.co.in/media/1155/amts-timings_may24.pdf",
+    "note": "AMTS route-wise timings, May 2024 (archived copy of https://www.amts.co.in/media/1155/amts-timings_may24.pdf; amts.co.in was unreachable and this is the latest archived timetable), page 59-60, route 58 (diversion): Thaltej Gam - Nava Naroda (Kush Society). Departures are the 'from Thaltej Gam' column. Trips that start at Gujarat University or Kalupur are excluded. No run time: the source gives no Thaltej Gam -> Naroda Gam time, and our sequence ends before the Nava Naroda terminus. No reverse: the reverse trips start at Nava Naroda, beyond our last stop.",
+    "serviceStart": "07:10",
+    "serviceEnd": "20:50",
+    "departures": [
+      "07:10", "07:30", "07:50", "08:10", "08:30", "08:50", "09:05", "09:25", "09:50", "10:15",
+      "10:45", "11:15", "11:50", "12:55", "13:25", "13:45", "14:00", "14:10", "14:30", "14:45",
+      "15:00", "15:15", "15:40", "16:00", "16:35", "17:05", "18:30", "19:00", "19:25", "19:45",
+      "20:20", "20:50"
+    ]
+  },
+  "amts-45": {
+    "source": "http://web.archive.org/web/20240704004606/https://www.amts.co.in/media/1155/amts-timings_may24.pdf",
+    "note": "AMTS route-wise timings, May 2024 (archived), page 45, route 45: Lal Darwaja Terminus - Shela Gam. Departures are the 'from Lal Darwaja' column (our first stop is the terminus). No run time: the source gives no Lal Darwaja -> Mumatpura time. No reverse: the reverse trips start at Shela Gam, beyond our last stop.",
+    "serviceStart": "06:00",
+    "serviceEnd": "18:40",
+    "departures": [
+      "06:00", "06:30", "07:00", "07:30", "08:10", "08:45", "09:20", "10:00", "10:45", "11:15",
+      "11:50", "12:30", "14:20", "14:50", "15:25", "16:05", "17:00", "17:30", "18:05", "18:40"
+    ]
+  },
+  "amts-144": {
+    "source": "http://web.archive.org/web/20240704004606/https://www.amts.co.in/media/1155/amts-timings_may24.pdf",
+    "note": "AMTS route-wise timings, May 2024 (archived), page 149-150, route 144: Arbudanagar - Gujarat University. Departures are the 'from Gujarat University' column (our first stop is the terminus). The early trips that start at Sarangpur are excluded. No run time: the source gives no Gujarat University -> Gomtipur time. No reverse: the reverse trips start at Arbudanagar, beyond our last stop.",
+    "serviceStart": "07:15",
+    "serviceEnd": "20:30",
+    "departures": [
+      "07:15", "07:40", "08:00", "08:20", "08:35", "08:50", "09:05", "09:15", "09:30", "09:45",
+      "10:00", "10:15", "10:30", "10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:20",
+      "12:35", "12:50", "13:05", "13:20", "13:40", "14:05", "14:35", "14:55", "15:25", "15:55",
+      "16:15", "16:30", "16:45", "17:00", "17:20", "17:35", "17:50", "18:05", "18:20", "18:40",
+      "18:55", "19:15", "19:30", "20:00", "20:30"
+    ]
+  },
+  "amts-75": {
+    "source": "http://web.archive.org/web/20240704004606/https://www.amts.co.in/media/1155/amts-timings_may24.pdf",
+    "note": "AMTS route-wise timings, May 2024 (archived), page 89, route 75 (diversion): Maninagar Terminus - Chandkheda (Sarthi Bungalows). Reverse only: departures from Maninagar Terminus (our last stop) toward Chandkheda; the evening trips that run only to Acher Depot are excluded. Forward is omitted because the published Chandkheda times are at the Sarthi Bungalows terminus, not at our first stop. No run time is published.",
+    "reverse": {
+      "serviceStart": "07:50",
+      "serviceEnd": "20:00",
+      "departures": [
+        "07:50", "08:30", "08:55", "09:10", "09:30", "09:50", "10:10", "10:30", "11:10", "11:25",
+        "11:50", "12:05", "12:20", "12:35", "12:50", "13:10", "13:30", "14:00", "14:45", "15:35",
+        "16:10", "16:30", "16:45", "17:05", "17:25", "17:45", "18:05", "18:40", "19:25", "20:00"
+      ]
+    }
+  },
+  "amts-160": {
+    "source": "http://web.archive.org/web/20240704004606/https://www.amts.co.in/media/1155/amts-timings_may24.pdf",
+    "note": "AMTS route-wise timings, May 2024 (archived), page 172, route 160: Hatkeshwar Terminus - Silver Oak University. Reverse only: departures from Hatkeshwar Terminus (our last stop). Forward is omitted because the published times are at Silver Oak University, beyond our first stop (Gujarat High Court). No run time is published for our section.",
+    "reverse": {
+      "serviceStart": "06:00",
+      "serviceEnd": "20:30",
+      "departures": [
+        "06:00", "06:35", "07:10", "07:45", "08:10", "08:45", "09:25", "10:00", "10:35", "11:10",
+        "11:45", "12:20", "13:35", "14:10", "14:45", "15:20", "15:55", "16:30", "17:35", "18:10",
+        "18:45", "19:20", "19:55", "20:30"
+      ]
+    }
+  }
+}
