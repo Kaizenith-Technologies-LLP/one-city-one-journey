@@ -1,29 +1,13 @@
-import { readFileSync, existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
 import { MODES } from '../config.js';
 import { haversine } from '../utils/geo.js';
 import { scheduleGaps } from './schedules.js';
 
-const DATA_DIR = process.env.DATA_DIR
-  ? path.resolve(process.env.DATA_DIR)
-  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../data');
-
-function readJson(name) {
-  const file = path.join(DATA_DIR, name);
-  if (!existsSync(file)) throw new Error(`Missing data file: ${file}`);
-  return JSON.parse(readFileSync(file, 'utf8').replace(/^﻿/, ''));
-}
-
 /**
- * Loads stops, lines, fares and schedules, and derives the per-stop line
- * index and per-segment distances used everywhere else.
+ * Builds the network from stops, lines, fares and schedules, and derives the
+ * per-stop line index and per-segment distances used everywhere else.
  */
-export function loadNetwork() {
-  const stopList = readJson('stops.json');
-  const lineList = readJson('lines.json');
-  const fares = readJson('fares.json');
-  const schedules = existsSync(path.join(DATA_DIR, 'schedules.json')) ? readJson('schedules.json') : {};
+export function loadNetwork({ stops: stopList, lines: lineList, fares, schedules = {} }) {
+  if (!stopList || !lineList || !fares) throw new Error('Network data is incomplete (stops, lines and fares are required)');
 
   const stops = new Map(stopList.map((s) => [s.id, { ...s, lines: [] }]));
   const lines = new Map();

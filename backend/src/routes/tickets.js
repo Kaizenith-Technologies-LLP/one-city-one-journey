@@ -4,8 +4,8 @@ import { issueTicket, getTicket } from '../services/admin/tickets.js';
 const router = Router();
 
 /** Issues an integrated ticket: { from, to, optionId? | signature? } (same from/to as /plan). */
-router.post('/tickets', (req, res) => {
-  res.status(201).json(issueTicket(req.body ?? {}, { channel: req.body?.channel === 'web' ? 'web' : 'app' }));
+router.post('/tickets', async (req, res) => {
+  res.status(201).json(await issueTicket(req.body ?? {}, { channel: req.body?.channel === 'web' ? 'web' : 'app' }));
 });
 
 router.get('/tickets/:id', (req, res) => {

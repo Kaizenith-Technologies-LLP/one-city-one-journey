@@ -2,13 +2,13 @@ import { loadNetwork } from './services/network.js';
 import { detectHubs, detectCorridorOverlaps } from './services/overlap.js';
 import { Planner } from './services/planner.js';
 
-/** Everything derived from the data files, built once at startup. */
+/** Everything derived from the network data, rebuilt whenever it changes. */
 let state = null;
 let loadError = null;
 
-export function initState() {
+export function initState(docs) {
   try {
-    const network = loadNetwork();
+    const network = loadNetwork(docs);
     const { hubs, stopToHub, links } = detectHubs(network);
     const overlaps = detectCorridorOverlaps(network, stopToHub);
     const planner = new Planner(network, stopToHub);

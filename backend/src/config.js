@@ -1,12 +1,10 @@
-import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-/** Admin-owned state (settings, tickets, audit). Never inside data/. */
+/** Legacy JSON storage, imported into the database once when its tables are empty. */
 export const STORAGE_DIR = process.env.STORAGE_DIR
   ? path.resolve(process.env.STORAGE_DIR)
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../storage');
-export const SETTINGS_FILE = path.join(STORAGE_DIR, 'settings.json');
 
 /** Mode and operator metadata, plus tunable constants for the planner. */
 export const MODES = {
@@ -85,23 +83,11 @@ export const SETTINGS_DEFAULTS = {
   costWeights: {},
 };
 
-export function readSettingsFile() {
-  if (!existsSync(SETTINGS_FILE)) return {};
-  try {
-    return JSON.parse(readFileSync(SETTINGS_FILE, 'utf8').replace(/^﻿/, ''));
-  } catch (err) {
-    console.warn(`Ignoring unreadable ${SETTINGS_FILE}: ${err.message}`);
-    return {};
-  }
-}
-
 /** Merges admin overrides into FARE_SHARE and MODES in place (defaults first, so removed keys reset). */
-export function applySettings(overrides = readSettingsFile()) {
+export function applySettings(overrides = {}) {
   const o = { ...SETTINGS_DEFAULTS, ...overrides, costWeights: { ...SETTINGS_DEFAULTS.costWeights, ...overrides.costWeights } };
   FARE_SHARE.integrationDiscount = o.integrationDiscount;
   FARE_SHARE.fareWeight = o.fareWeight;
   for (const [k, m] of Object.entries(MODES)) m.costWeight = o.costWeights[k];
   return o;
 }
-
-applySettings();

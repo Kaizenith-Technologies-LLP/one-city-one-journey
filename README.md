@@ -28,7 +28,7 @@ Built for **Metro Hacks, Track 2, PS-08: One City, One Journey**. It also borrow
 - [Active service alerts](https://api-production-1452.up.railway.app/api/closures)
 - [Operator fare settlement](https://api-production-1452.up.railway.app/api/settlement)
 
-> Admin edits to stations, lines and fares are reset to the sourced data on each redeploy. Tickets, closures and settings persist.
+> All data is stored in **PostgreSQL** (Railway), so admin edits, tickets, closures and settings survive restarts and redeploys.
 
 ---
 
@@ -128,12 +128,13 @@ Built for **Metro Hacks, Track 2, PS-08: One City, One Journey**. It also borrow
                 │ API: backend/ (Node.js 20+, Express 5)        │
                 │ RAPTOR planner · hubs & overlaps · fares       │
                 │ tickets · closures · brief · weather           │
-                └────────┬───────────────────────────┬───────────┘
-                         │                           │
-            backend/data/*.json            storage/*.json on a persistent
-            transit network (in git)       volume: tickets, closures,
-                                           settings, audit log
-                         ^
+                └───────────────────────┬────────────────────────┘
+                         ^              │
+                         │              v
+                         │   PostgreSQL (Railway): network data, tickets,
+                         │   closures, settings, audit log
+                         │   (network seeded from backend/data/*.json in git)
+                         │
  Operators ──>  Admin portal (clients/admin, Next.js)
 ```
 
@@ -147,7 +148,8 @@ The **API is the single source of truth**. Every client uses the same endpoints.
 | Public website | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Leaflet |
 | Maps | OpenStreetMap tiles |
 | Weather | Open-Meteo |
-| Hosting | Railway (API with a persistent volume, admin portal, website); GitHub Releases (APK) |
+| Database | PostgreSQL 16 on Railway (`pg` driver) |
+| Hosting | Railway (API, PostgreSQL, admin portal, website); GitHub Releases (APK) |
 
 ## Data and sources
 
@@ -200,12 +202,12 @@ The full endpoint list is in [`backend/README.md`](backend/README.md).
 
 ## Run locally
 
-Requirements: Node.js 20+; Flutter 3.47+ for the app.
+Requirements: Node.js 20+, PostgreSQL 14+ (local or Railway); Flutter 3.47+ for the app.
 
 ```bash
 # API on http://localhost:4000
 cd backend && npm install
-ADMIN_TOKEN=<secret> TICKET_SECRET=<secret> npm run dev
+DATABASE_URL=postgresql://user:pass@localhost:5432/onejourney ADMIN_TOKEN=<secret> TICKET_SECRET=<secret> npm run dev
 
 # Admin portal on http://localhost:3001 (sign in with ADMIN_TOKEN)
 cd clients/admin && npm install && npm run dev
@@ -221,7 +223,8 @@ Railway project `one-city-one-journey`:
 
 | Service | Folder | Configuration |
 |---|---|---|
-| `api` | `backend/` | Volume at `/data`; `STORAGE_DIR=/data/storage`, `ADMIN_TOKEN`, `TICKET_SECRET` |
+| `api` | `backend/` | `DATABASE_URL` = the Postgres service's private URL; `ADMIN_TOKEN`, `TICKET_SECRET` |
+| `Postgres` | Railway database | PostgreSQL 16 with its own volume |
 | `admin` | `clients/admin/` | `NEXT_PUBLIC_API_BASE` = the API URL; `PORT=3001` |
 | `web` | `clients/web/` | `NEXT_PUBLIC_API_BASE` = the API URL |
 
@@ -240,7 +243,6 @@ To deploy: run `railway link` once in the folder, then `railway up --service <na
 ## Not in this version
 
 - **Payments:** tickets are issued without payment, and refunds are a status change only.
-- **Storage:** JSON files on a persistent volume, not a database.
 - **Admin accounts:** one shared password; no individual accounts or roles.
 - **API protection:** no rate limiting; CORS is open.
 - **Map tiles:** the public OpenStreetMap tile servers, whose usage policy does not allow heavy production traffic.

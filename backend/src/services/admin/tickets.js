@@ -55,7 +55,7 @@ function endpoint(value, name, label) {
  * Re-plans on the server so the fare cannot be tampered with, picks the
  * requested option (by signature, then id, else fastest), and issues a ticket.
  */
-export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
+export async function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
   const { planner } = getState();
   const from = endpoint(body.from, body.fromName, 'from');
   const to = endpoint(body.to, body.toName, 'to');
@@ -104,8 +104,7 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
     refundAmount: null,
   };
   ticket.qr = qrPayload(ticket);
-  list.push(ticket);
-  writeAll(list);
+  await writeAll([ticket]);
   return ticket;
 }
 
@@ -139,14 +138,14 @@ export function listTickets({ status, operator, mode, date, from, to, q, limit =
   return { total: list.length, items: list.slice(offset, offset + limit) };
 }
 
-function transition(id, fn) {
+async function transition(id, fn) {
   const list = readAll();
   const i = list.findIndex((x) => x.id === String(id).toUpperCase());
   if (i < 0) throw httpError(404, 'Ticket not found');
   const before = view(list[i]);
-  list[i] = { ...list[i], ...fn(before) };
-  writeAll(list);
-  return { before, after: view(list[i]) };
+  const updated = { ...list[i], ...fn(before) };
+  await writeAll([updated]);
+  return { before, after: view(updated) };
 }
 
 /** Marks a ticket used (inspector scan / gate). Only active, unexpired tickets. */

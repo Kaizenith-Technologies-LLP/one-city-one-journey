@@ -2,21 +2,20 @@ import { randomUUID } from 'node:crypto';
 import { readStorage, writeStorage } from './store.js';
 
 const FILE = 'audit.json';
-const MAX_ENTRIES = 5000;
 
-/** Appends one admin write to storage/audit.json (newest last, capped). */
-export function audit(req, action, entity, entityId, details = {}) {
-  const log = readStorage(FILE, []);
-  log.push({
-    id: randomUUID(),
-    at: new Date().toISOString(),
-    action,
-    entity,
-    entityId: entityId ?? null,
-    details,
-    ip: req?.ip ?? null,
-  });
-  writeStorage(FILE, log.slice(-MAX_ENTRIES));
+/** Records one admin write in the audit log. */
+export async function audit(req, action, entity, entityId, details = {}) {
+  await writeStorage(FILE, [
+    {
+      id: randomUUID(),
+      at: new Date().toISOString(),
+      action,
+      entity,
+      entityId: entityId ?? null,
+      details,
+      ip: req?.ip ?? null,
+    },
+  ]);
 }
 
 export function listAudit({ entity, action, q, limit = 200, offset = 0 } = {}) {

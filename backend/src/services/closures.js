@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto';
 import { MODES } from '../config.js';
-import { readData, readStorage, writeStorage } from './admin/store.js';
+import { readData, readStorage, writeStorage, deleteStorage } from './admin/store.js';
 import { httpError } from './planner.js';
 
 /**
@@ -71,30 +71,25 @@ export function listClosures({ status, at = new Date() } = {}) {
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 }
 
-export function createClosure(body) {
-  const list = readAll();
+export async function createClosure(body) {
   const now = new Date().toISOString();
-  const closure = { id: newId(new Set(list.map((c) => c.id))), ...check(body), createdAt: now, updatedAt: now };
-  list.push(closure);
-  writeStorage(FILE, list);
+  const closure = { id: newId(new Set(readAll().map((c) => c.id))), ...check(body), createdAt: now, updatedAt: now };
+  await writeStorage(FILE, [closure]);
   return closure;
 }
 
-export function updateClosure(id, body) {
-  const list = readAll();
-  const i = list.findIndex((c) => c.id === id);
-  if (i < 0) throw httpError(404, 'Closure not found');
-  const before = list[i];
-  list[i] = { id, ...check({ ...before, ...body }), createdAt: before.createdAt, updatedAt: new Date().toISOString() };
-  writeStorage(FILE, list);
-  return { before, after: list[i] };
+export async function updateClosure(id, body) {
+  const before = readAll().find((c) => c.id === id);
+  if (!before) throw httpError(404, 'Closure not found');
+  const after = { id, ...check({ ...before, ...body }), createdAt: before.createdAt, updatedAt: new Date().toISOString() };
+  await writeStorage(FILE, [after]);
+  return { before, after };
 }
 
-export function deleteClosure(id) {
-  const list = readAll();
-  const c = list.find((x) => x.id === id);
+export async function deleteClosure(id) {
+  const c = readAll().find((x) => x.id === id);
   if (!c) throw httpError(404, 'Closure not found');
-  writeStorage(FILE, list.filter((x) => x.id !== id));
+  await deleteStorage(FILE, id);
   return c;
 }
 

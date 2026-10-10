@@ -1,6 +1,8 @@
-import { MODES, FARE_SHARE, SETTINGS_DEFAULTS, applySettings, readSettingsFile } from '../../config.js';
-import { writeStorage } from './store.js';
+import { MODES, FARE_SHARE, SETTINGS_DEFAULTS, applySettings } from '../../config.js';
+import { readStorage, writeStorage } from './store.js';
 import { checkSettings } from './validate.js';
+
+const overrides = () => readStorage('settings.json', {});
 
 /** Current fare-sharing settings, as applied to the live config objects. */
 export function getSettings() {
@@ -10,22 +12,22 @@ export function getSettings() {
     costWeights: Object.fromEntries(Object.entries(MODES).map(([k, m]) => [k, m.costWeight])),
     modes: Object.fromEntries(Object.entries(MODES).map(([k, m]) => [k, { label: m.label, operator: m.operator, color: m.color }])),
     defaults: SETTINGS_DEFAULTS,
-    overrides: readSettingsFile(),
+    overrides: overrides(),
   };
 }
 
-export function updateSettings(body) {
+export async function updateSettings(body) {
   const before = getSettings();
   const patch = checkSettings(body);
-  const current = readSettingsFile();
+  const current = overrides();
   const next = { ...current, ...patch, costWeights: { ...current.costWeights, ...patch.costWeights } };
-  writeStorage('settings.json', next);
+  await writeStorage('settings.json', next);
   applySettings(next);
   return { before, after: getSettings() };
 }
 
-export function resetSettings() {
-  writeStorage('settings.json', {});
+export async function resetSettings() {
+  await writeStorage('settings.json', {});
   applySettings({});
   return getSettings();
 }

@@ -18,16 +18,34 @@ npm run validate   # check data/*.json
 | `PORT` | no (4000) | HTTP port |
 | `ADMIN_TOKEN` | for admin | Bearer token and admin password. Without it every `/api/admin` endpoint returns 503. |
 | `TICKET_SECRET` | yes in production | Signs ticket QR codes. Without it a per-process key is used, so QR codes stop verifying after a restart. |
-| `STORAGE_DIR` | no (`./storage`) | Where tickets, closures, settings and the audit log are written |
-| `DATA_DIR` | no (`./data`) | Where the transit network files are read from |
+| `DATABASE_URL` | yes | PostgreSQL connection string. On Railway use the Postgres service's private URL. For a public proxy add `?sslmode=no-verify`. |
+| `DATA_DIR` | no (`./data`) | Seed files for the network data |
+| `STORAGE_DIR` | no (`./storage`) | Legacy JSON storage, imported once when the database tables are empty |
+
+## Storage
+
+All state lives in **PostgreSQL**. The tables are created on startup.
+
+| Table | Content |
+|---|---|
+| `network_docs` | `stops.json`, `lines.json`, `fares.json` and `schedules.json`, one row each (JSONB), with the hash of the repository file they were seeded from |
+| `tickets` | One row per ticket, with `status`, `created_at` and `valid_until` columns plus the full record |
+| `closures` | One row per closure, with `starts_at` and `ends_at` |
+| `audit_log` | One row per admin change |
+| `settings` | Fare-sharing settings |
+
+- **Network data.** It is seeded from `data/*.json`. When a file in the repository changes, the next start re-seeds it, so committed data wins over earlier admin edits. Admin edits otherwise persist across restarts and redeploys.
+- **Reads and writes.** Reads come from an in-memory copy loaded at startup. Each write goes to the database first, and the in-memory copy is updated only after it succeeds. Network edits are written in a single transaction and rolled back if the data would not load.
+- **Legacy import.** On first start against an empty database, existing JSON files in `STORAGE_DIR` are imported.
 
 ## Layout
 
 ```
 src/
-  index.js                 app setup and route registration
+  index.js                 startup (storage, settings, state) and route registration
+  db.js                    PostgreSQL pool, schema, transactions
   config.js                modes and operators, planner, heat, overlap and fare-share settings
-  state.js                 builds network, hubs, overlaps and planner from the data files
+  state.js                 builds network, hubs, overlaps and planner from the network data
   routes/
     network.js             /meta, /stops, /lines
     overlaps.js            /hubs, /overlaps
@@ -44,9 +62,8 @@ src/
     weather.js             Open-Meteo client (cached 15 min)
     admin/                 auth, audit, store, validation, network editing,
                            settings, tickets, dashboard, brief
-data/                      stops.json, lines.json, fares.json, schedules.json
+data/                      seed files: stops.json, lines.json, fares.json, schedules.json
 scripts/validate-data.mjs  data checks
-storage/                   runtime state (ignored by git)
 ```
 
 ## How planning works

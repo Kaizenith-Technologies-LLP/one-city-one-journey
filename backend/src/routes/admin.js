@@ -14,7 +14,7 @@ const admin = express();
 const int = (v, d) => (Number.isFinite(Number(v)) && v !== '' && v != null ? Math.max(0, Math.floor(Number(v))) : d);
 const str = (v) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
 
-admin.post('/login', (req, res) => {
+admin.post('/login', async (req, res) => {
   res.json(login(req.body?.password));
 });
 
@@ -28,37 +28,37 @@ admin.get('/stops', (req, res) => {
   res.json(net.listStops({ mode: str(req.query.mode), q: str(req.query.q), limit: Math.min(int(req.query.limit, 200), 5000), offset: int(req.query.offset, 0) }));
 });
 admin.get('/stops/:id', (req, res) => res.json(net.getStop(req.params.id)));
-admin.post('/stops', (req, res) => {
-  const stop = net.createStop(req.body ?? {});
-  audit(req, 'create', 'stop', stop.id, { after: stop });
+admin.post('/stops', async (req, res) => {
+  const stop = await net.createStop(req.body ?? {});
+  await audit(req, 'create', 'stop', stop.id, { after: stop });
   res.status(201).json(stop);
 });
-admin.put('/stops/:id', (req, res) => {
-  const { before, after } = net.updateStop(req.params.id, req.body ?? {});
-  audit(req, 'update', 'stop', after.id, { before, after });
+admin.put('/stops/:id', async (req, res) => {
+  const { before, after } = await net.updateStop(req.params.id, req.body ?? {});
+  await audit(req, 'update', 'stop', after.id, { before, after });
   res.json(after);
 });
-admin.delete('/stops/:id', (req, res) => {
+admin.delete('/stops/:id', async (req, res) => {
   const force = ['1', 'true'].includes(String(req.query.force));
-  const out = net.deleteStop(req.params.id, force);
-  audit(req, 'delete', 'stop', req.params.id, { before: out.stop, force, removedFromLines: out.removedFromLines });
+  const out = await net.deleteStop(req.params.id, force);
+  await audit(req, 'delete', 'stop', req.params.id, { before: out.stop, force, removedFromLines: out.removedFromLines });
   res.json({ deleted: req.params.id, removedFromLines: out.removedFromLines });
 });
 
 admin.get('/stops/:id/platforms', (req, res) => res.json(net.listPlatforms(req.params.id)));
-admin.post('/stops/:id/platforms', (req, res) => {
-  const p = net.createPlatform(req.params.id, req.body ?? {});
-  audit(req, 'create', 'platform', `${req.params.id}/${p.id}`, { after: p });
+admin.post('/stops/:id/platforms', async (req, res) => {
+  const p = await net.createPlatform(req.params.id, req.body ?? {});
+  await audit(req, 'create', 'platform', `${req.params.id}/${p.id}`, { after: p });
   res.status(201).json(p);
 });
-admin.put('/stops/:id/platforms/:pid', (req, res) => {
-  const p = net.updatePlatform(req.params.id, req.params.pid, req.body ?? {});
-  audit(req, 'update', 'platform', `${req.params.id}/${p.id}`, { after: p });
+admin.put('/stops/:id/platforms/:pid', async (req, res) => {
+  const p = await net.updatePlatform(req.params.id, req.params.pid, req.body ?? {});
+  await audit(req, 'update', 'platform', `${req.params.id}/${p.id}`, { after: p });
   res.json(p);
 });
-admin.delete('/stops/:id/platforms/:pid', (req, res) => {
-  const p = net.deletePlatform(req.params.id, req.params.pid);
-  audit(req, 'delete', 'platform', `${req.params.id}/${p.id}`, { before: p });
+admin.delete('/stops/:id/platforms/:pid', async (req, res) => {
+  const p = await net.deletePlatform(req.params.id, req.params.pid);
+  await audit(req, 'delete', 'platform', `${req.params.id}/${p.id}`, { before: p });
   res.json({ deleted: p.id });
 });
 
@@ -66,47 +66,47 @@ admin.delete('/stops/:id/platforms/:pid', (req, res) => {
 
 admin.get('/lines', (req, res) => res.json(net.listLines({ mode: str(req.query.mode), q: str(req.query.q), status: str(req.query.status) })));
 admin.get('/lines/:id', (req, res) => res.json(net.getLine(req.params.id)));
-admin.post('/lines', (req, res) => {
-  const line = net.createLine(req.body ?? {});
-  audit(req, 'create', 'line', line.id, { after: line });
+admin.post('/lines', async (req, res) => {
+  const line = await net.createLine(req.body ?? {});
+  await audit(req, 'create', 'line', line.id, { after: line });
   res.status(201).json(line);
 });
-admin.put('/lines/:id', (req, res) => {
-  const { before, after } = net.updateLine(req.params.id, req.body ?? {});
-  audit(req, 'update', 'line', after.id, { before, after });
+admin.put('/lines/:id', async (req, res) => {
+  const { before, after } = await net.updateLine(req.params.id, req.body ?? {});
+  await audit(req, 'update', 'line', after.id, { before, after });
   res.json(after);
 });
-admin.post('/lines/:id/status', (req, res) => {
+admin.post('/lines/:id/status', async (req, res) => {
   const active = req.body?.active !== false;
-  const { before, after } = net.setLineActive(req.params.id, active, str(req.body?.reason));
-  audit(req, active ? 'resume' : 'suspend', 'line', after.id, { reason: after.suspendedReason ?? null, wasActive: before.active !== false });
+  const { before, after } = await net.setLineActive(req.params.id, active, str(req.body?.reason));
+  await audit(req, active ? 'resume' : 'suspend', 'line', after.id, { reason: after.suspendedReason ?? null, wasActive: before.active !== false });
   res.json(after);
 });
-admin.delete('/lines/:id', (req, res) => {
-  const line = net.deleteLine(req.params.id);
-  audit(req, 'delete', 'line', line.id, { before: line });
+admin.delete('/lines/:id', async (req, res) => {
+  const line = await net.deleteLine(req.params.id);
+  await audit(req, 'delete', 'line', line.id, { before: line });
   res.json({ deleted: line.id });
 });
 
 // ---------- fares + fare sharing ----------
 
 admin.get('/fares', (_req, res) => res.json(net.getFares()));
-admin.put('/fares/:mode', (req, res) => {
-  const { before, after } = net.updateFares(req.params.mode, req.body ?? {});
-  audit(req, 'update', 'fares', req.params.mode, { before, after });
+admin.put('/fares/:mode', async (req, res) => {
+  const { before, after } = await net.updateFares(req.params.mode, req.body ?? {});
+  await audit(req, 'update', 'fares', req.params.mode, { before, after });
   res.json(after);
 });
 
 admin.get('/settings', (_req, res) => res.json(getSettings()));
-admin.put('/settings', (req, res) => {
-  const { before, after } = updateSettings(req.body ?? {});
+admin.put('/settings', async (req, res) => {
+  const { before, after } = await updateSettings(req.body ?? {});
   const pick = ({ integrationDiscount, fareWeight, costWeights }) => ({ integrationDiscount, fareWeight, costWeights });
-  audit(req, 'update', 'settings', 'fare-sharing', { before: pick(before), after: pick(after) });
+  await audit(req, 'update', 'settings', 'fare-sharing', { before: pick(before), after: pick(after) });
   res.json(after);
 });
-admin.post('/settings/reset', (req, res) => {
-  const after = resetSettings();
-  audit(req, 'reset', 'settings', 'fare-sharing', {});
+admin.post('/settings/reset', async (req, res) => {
+  const after = await resetSettings();
+  await audit(req, 'reset', 'settings', 'fare-sharing', {});
   res.json(after);
 });
 
@@ -127,22 +127,22 @@ admin.get('/tickets', (req, res) => {
     }),
   );
 });
-admin.post('/tickets/scan', (req, res) => {
+admin.post('/tickets/scan', async (req, res) => {
   // Validate by QR payload, as a gate / inspector would.
   const id = verifyQr(req.body?.qr);
-  const { after } = validateTicket(id, { by: 'qr-scan' });
-  audit(req, 'validate', 'ticket', id, { via: 'qr' });
+  const { after } = await validateTicket(id, { by: 'qr-scan' });
+  await audit(req, 'validate', 'ticket', id, { via: 'qr' });
   res.json(after);
 });
 admin.get('/tickets/:id', (req, res) => res.json(getTicket(req.params.id)));
-admin.post('/tickets/:id/validate', (req, res) => {
-  const { after } = validateTicket(req.params.id);
-  audit(req, 'validate', 'ticket', after.id, {});
+admin.post('/tickets/:id/validate', async (req, res) => {
+  const { after } = await validateTicket(req.params.id);
+  await audit(req, 'validate', 'ticket', after.id, {});
   res.json(after);
 });
-admin.post('/tickets/:id/cancel', (req, res) => {
-  const { after } = cancelTicket(req.params.id, { reason: str(req.body?.reason), refundAmount: req.body?.refundAmount });
-  audit(req, 'cancel', 'ticket', after.id, { refundAmount: after.refundAmount, reason: after.cancelReason });
+admin.post('/tickets/:id/cancel', async (req, res) => {
+  const { after } = await cancelTicket(req.params.id, { reason: str(req.body?.reason), refundAmount: req.body?.refundAmount });
+  await audit(req, 'cancel', 'ticket', after.id, { refundAmount: after.refundAmount, reason: after.cancelReason });
   res.json(after);
 });
 
@@ -151,19 +151,19 @@ admin.get('/reports/revenue', (req, res) => res.json(revenueReport({ from: str(r
 // ---------- closures (diversions) + morning brief ----------
 
 admin.get('/closures', (req, res) => res.json(listClosures({ status: str(req.query.status) }).map((c) => ({ ...c, advisory: advisory(c) }))));
-admin.post('/closures', (req, res) => {
-  const c = createClosure(req.body ?? {});
-  audit(req, 'create', 'closure', c.id, { after: c });
+admin.post('/closures', async (req, res) => {
+  const c = await createClosure(req.body ?? {});
+  await audit(req, 'create', 'closure', c.id, { after: c });
   res.status(201).json({ ...c, advisory: advisory(c) });
 });
-admin.put('/closures/:id', (req, res) => {
-  const { before, after } = updateClosure(req.params.id, req.body ?? {});
-  audit(req, 'update', 'closure', after.id, { before, after });
+admin.put('/closures/:id', async (req, res) => {
+  const { before, after } = await updateClosure(req.params.id, req.body ?? {});
+  await audit(req, 'update', 'closure', after.id, { before, after });
   res.json({ ...after, advisory: advisory(after) });
 });
-admin.delete('/closures/:id', (req, res) => {
-  const c = deleteClosure(req.params.id);
-  audit(req, 'delete', 'closure', c.id, { before: c });
+admin.delete('/closures/:id', async (req, res) => {
+  const c = await deleteClosure(req.params.id);
+  await audit(req, 'delete', 'closure', c.id, { before: c });
   res.json({ deleted: c.id });
 });
 

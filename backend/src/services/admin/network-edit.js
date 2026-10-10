@@ -8,7 +8,7 @@ import { checkStop, checkPlatform, checkLine, checkSlabs, checkMode, slugify, un
 
 /**
  * Admin edits work on the raw data files (which include suspended lines and
- * extra fields), then commitData() rewrites them and rebuilds the live state.
+ * extra fields), then commitData() saves them and rebuilds the live state.
  */
 
 const notFound = (what) => httpError(404, `${what} not found`);
@@ -72,17 +72,17 @@ export function getStop(id) {
   };
 }
 
-export function createStop(body) {
+export async function createStop(body) {
   const { stops } = load();
   const taken = new Set(stops.map((s) => s.id));
   const id = body.id ? String(body.id) : uniqueId(`${body.mode}-${slugify(body.name ?? '')}`, taken);
   if (taken.has(id)) throw httpError(409, `Stop id ${id} already exists`);
   const stop = checkStop({ ...body, id, platforms: [] });
-  commitData({ 'stops.json': [...stops, stop] });
+  await commitData({ 'stops.json': [...stops, stop] });
   return stop;
 }
 
-export function updateStop(id, body) {
+export async function updateStop(id, body) {
   const { stops } = load();
   const i = stops.findIndex((s) => s.id === id);
   if (i < 0) throw notFound('Stop');
@@ -91,12 +91,12 @@ export function updateStop(id, body) {
   const stop = checkStop(merged);
   const next = [...stops];
   next[i] = stop;
-  commitData({ 'stops.json': next });
+  await commitData({ 'stops.json': next });
   return { before: stops[i], after: stop };
 }
 
 /** Refuses while lines use the stop, unless force, which also drops it from those lines. */
-export function deleteStop(id, force) {
+export async function deleteStop(id, force) {
   const { stops, lines } = load();
   const stop = stops.find((s) => s.id === id);
   if (!stop) throw notFound('Stop');
@@ -115,13 +115,13 @@ export function deleteStop(id, force) {
     });
     if (shortLines.length) throw httpError(409, `Removing this stop would leave fewer than 2 stops on: ${shortLines.join(', ')}. Edit or delete those lines first.`);
   }
-  commitData(changes);
+  await commitData(changes);
   return { stop, removedFromLines: using.map((l) => l.id) };
 }
 
 // ---------- platforms ----------
 
-function withStop(stopId, fn) {
+async function withStop(stopId, fn) {
   const { stops, lines } = load();
   const i = stops.findIndex((s) => s.id === stopId);
   if (i < 0) throw notFound('Stop');
@@ -131,7 +131,7 @@ function withStop(stopId, fn) {
   const next = [...stops];
   next[i] = { ...stops[i], platforms };
   if (!platforms.length) delete next[i].platforms;
-  commitData({ 'stops.json': next });
+  await commitData({ 'stops.json': next });
   return result;
 }
 
@@ -227,18 +227,18 @@ export function getLine(id) {
   };
 }
 
-export function createLine(body) {
+export async function createLine(body) {
   const { stops, lines } = load();
   const taken = new Set(lines.map((l) => l.id));
   checkMode(body.mode);
   const id = body.id ? String(body.id) : uniqueId(`${body.mode}-${slugify(body.shortName || body.name || '')}`, taken);
   if (taken.has(id)) throw httpError(409, `Line id ${id} already exists`);
   const line = checkLine({ ...body, id }, new Set(stops.map((s) => s.id)));
-  commitData({ 'lines.json': [...lines, line] });
+  await commitData({ 'lines.json': [...lines, line] });
   return { ...line, active: line.active !== false };
 }
 
-export function updateLine(id, body) {
+export async function updateLine(id, body) {
   const { stops, lines } = load();
   const i = lines.findIndex((l) => l.id === id);
   if (i < 0) throw notFound('Line');
@@ -254,7 +254,7 @@ export function updateLine(id, body) {
   const changes = { 'lines.json': next };
   const pruned = prunePlatforms(stops, next);
   if (pruned) changes['stops.json'] = pruned;
-  commitData(changes);
+  await commitData(changes);
   return { before: lines[i], after: { ...line, active: line.active !== false } };
 }
 
@@ -262,7 +262,7 @@ export function setLineActive(id, active, reason) {
   return updateLine(id, { active: Boolean(active), suspendedReason: active ? undefined : reason });
 }
 
-export function deleteLine(id) {
+export async function deleteLine(id) {
   const { stops, lines } = load();
   const line = lines.find((l) => l.id === id);
   if (!line) throw notFound('Line');
@@ -270,7 +270,7 @@ export function deleteLine(id) {
   const changes = { 'lines.json': next };
   const pruned = prunePlatforms(stops, next);
   if (pruned) changes['stops.json'] = pruned;
-  commitData(changes);
+  await commitData(changes);
   return line;
 }
 
@@ -286,7 +286,7 @@ export function getFares() {
   );
 }
 
-export function updateFares(mode, body) {
+export async function updateFares(mode, body) {
   checkMode(mode);
   const fares = readData('fares.json');
   const before = fares[mode] ?? null;
@@ -296,6 +296,6 @@ export function updateFares(mode, body) {
     slabs: checkSlabs(body.slabs),
   };
   if (body.source !== undefined) after.source = body.source;
-  commitData({ 'fares.json': { ...fares, [mode]: after } });
+  await commitData({ 'fares.json': { ...fares, [mode]: after } });
   return { before, after };
 }
