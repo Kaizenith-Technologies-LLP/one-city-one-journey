@@ -10,7 +10,8 @@ Built for **Metro Hacks, Track 2, PS-08: One City, One Journey**. It also borrow
 
 | | |
 |---|---|
-| **Android app** | [Download one-journey-v1.0.0.apk](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/download/v1.0.0/one-journey-v1.0.0.apk) ([release page](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/tag/v1.0.0)) |
+| **Android app** | [Download one-journey-v1.0.1.apk](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/download/v1.0.1/one-journey-v1.0.1.apk) ([release page](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/tag/v1.0.1)) |
+| **Booking website** | https://web-production-72210.up.railway.app (plan and book in a browser, no install) |
 | **Admin portal** | https://admin-production-3546.up.railway.app |
 | **Admin password** | `OneJourney-PS08-Judges` (full access) |
 | **Live API** | https://api-production-1452.up.railway.app/api |
@@ -80,7 +81,7 @@ Built for **Metro Hacks, Track 2, PS-08: One City, One Journey**. It also borrow
 | Feature | What it adds |
 |---|---|
 | **Overlapping stations** | Stops of different modes within 300 m, or within 800 m with a matching name, are merged into interchange hubs: 21 on today's data, including 3-mode hubs such as Kalupur and Ranip. *Corridor overlaps* show where two operators run through the same consecutive hubs; none are found on today's data, because only consecutive shared hubs count. |
-| **Schedule-aware feasibility** | A change is offered only if you can make it: at least a 2-minute buffer plus the walking time, inside each line's service hours. Late at night it explains "last departure left at 23:00" rather than inventing a route. |
+| **Schedule-aware feasibility** | A change is offered only if you can make it: at least a 2-minute buffer plus the walking time, inside each line's service hours. Late at night, when nothing is running, it shows the first trips of the next morning and lets you book them. A "Tomorrow" departure option is also available. Stops without a timetabled line walk you to the nearest Metro station. |
 | **Diversions (PS-10)** | Close a line, a line section or a stop for a time window. The planner routes around it. Advisories are generated in English, Gujarati and Hindi, with a WhatsApp-ready text. |
 | **Heat-aware routing (PS-11)** | Live feels-like temperature from Open-Meteo. At 40 °C and above (the IMD heatwave threshold for the plains), the recommendation favours less walking among routes arriving within 10 minutes, and walks of 300 m or more are flagged. |
 | **Morning brief (PS-13)** | A one-page daily report across operators, with flagged ±25% moves against the 7-day average. Possible causes are drawn from closures, line suspensions, fare changes and observed rain or heat. |
@@ -143,10 +144,10 @@ The **API is the single source of truth**. Every client uses the same endpoints.
 | API | Node.js, Express 5, ES modules (dependencies: `express`, `cors`) |
 | Mobile app | Flutter 3.47 (`http`, `flutter_map`, `latlong2`) |
 | Admin portal | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
-| Public website | Next.js (in development in `clients/web`) |
+| Public website | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Leaflet |
 | Maps | OpenStreetMap tiles |
 | Weather | Open-Meteo |
-| Hosting | Railway (API with a persistent volume, admin portal); GitHub Releases (APK) |
+| Hosting | Railway (API with a persistent volume, admin portal, website); GitHub Releases (APK) |
 
 ## Data and sources
 
@@ -222,6 +223,7 @@ Railway project `one-city-one-journey`:
 |---|---|---|
 | `api` | `backend/` | Volume at `/data`; `STORAGE_DIR=/data/storage`, `ADMIN_TOKEN`, `TICKET_SECRET` |
 | `admin` | `clients/admin/` | `NEXT_PUBLIC_API_BASE` = the API URL; `PORT=3001` |
+| `web` | `clients/web/` | `NEXT_PUBLIC_API_BASE` = the API URL |
 
 To deploy: run `railway link` once in the folder, then `railway up --service <name>`. The APK is published as a GitHub Release.
 
@@ -232,7 +234,7 @@ To deploy: run `railway link` once in the folder, then `railway up --service <na
 | [`backend/`](backend/README.md) | API, planner, business logic, transit data, data validator |
 | [`clients/app/`](clients/app/README.md) | Flutter commuter app |
 | [`clients/admin/`](clients/admin/README.md) | Admin portal |
-| `clients/web/` | Public commuter website (in development) |
+| `clients/web/` | Public commuter website: plan, book, my tickets, alerts |
 | `docs/PLAN.md` | Original build plan |
 
 ## Not in this version
