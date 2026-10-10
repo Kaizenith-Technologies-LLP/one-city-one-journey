@@ -12,6 +12,23 @@ Built for **Metro Hacks, PS-08: One City, One Journey**. It also takes ideas fro
 
 **Install the app:** open the APK link on an Android phone (Android 7.0+), then allow "Install unknown apps" when asked.
 
+### For judges
+
+| | |
+|---|---|
+| Admin portal | https://admin-production-3546.up.railway.app |
+| Password | `OneJourney-PS08-Judges` |
+
+The login has full admin access, so everything can be tried: diversions with Gujarati and Hindi advisories, the morning brief, stations, lines, fares, fare-sharing settings, tickets and the audit log. Network edits are reset to the sourced data on each redeploy.
+
+**Suggested walkthrough:**
+1. In the app, plan Thaltej Gam → APMC. The route changes from Metro Blue to Red at Old High Court on one ticket.
+2. Book the ticket.
+3. In the admin portal, find the ticket under **Tickets** and validate it.
+4. Under **Diversions**, close the Blue line for the next hour.
+5. Plan again in the app. The planner routes around the closure, and the alert appears in three languages.
+6. Open **Morning brief** to see the day's report.
+
 **Try the API in a browser:** [a journey plan](https://api-production-1452.up.railway.app/api/plan?from=metro-thaltej-gam&to=metro-apmc&depart=09:00) · [interchange hubs](https://api-production-1452.up.railway.app/api/hubs) · [network summary](https://api-production-1452.up.railway.app/api/meta)
 
 ---
