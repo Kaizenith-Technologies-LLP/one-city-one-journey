@@ -29,18 +29,29 @@ const endpoint = (id: string, name: string): Endpoint | null => (id ? { id, name
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** A depart value is "HH:MM" (today) or an IST date-time (tomorrow). */
+const isDateTime = (v: string) => v.includes("T");
+
+/** Tomorrow's date in India at `hhmm`, as an ISO date-time with +05:30. */
+function tomorrowIst(hhmm: string) {
+  const d = new Date(Date.now() + 330 * 60e3 + 864e5);
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${hhmm}:00+05:30`;
+}
+
 function PlannerForm({ initial }: { initial: Query }) {
   const router = useRouter();
   const [from, setFrom] = useState(endpoint(initial.from, initial.fromName));
   const [to, setTo] = useState(endpoint(initial.to, initial.toName));
-  const [leaveAt, setLeaveAt] = useState(initial.depart);
+  const [leaveAt, setLeaveAt] = useState(isDateTime(initial.depart) ? initial.depart.slice(11, 16) : initial.depart);
+  const [tomorrow, setTomorrow] = useState(isDateTime(initial.depart));
   const [picking, setPicking] = useState<"start" | "destination" | null>(null);
   const same = !!from && !!to && from.id === to.id;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!from || !to || same) return;
-    router.push(`/${qs({ from: from.id, fromName: from.name, to: to.id, toName: to.name, depart: leaveAt })}`, { scroll: false });
+    const depart = leaveAt && tomorrow ? tomorrowIst(leaveAt) : leaveAt;
+    router.push(`/${qs({ from: from.id, fromName: from.name, to: to.id, toName: to.name, depart })}`, { scroll: false });
   };
 
   const chooseLeaveAt = () => {
@@ -88,11 +99,25 @@ function PlannerForm({ initial }: { initial: Query }) {
             </button>
           </div>
           {leaveAt ? (
-            <label className="flex items-center gap-2 text-sm text-ink">
-              <span className="sr-only">Departure time (today)</span>
-              <input type="time" required value={leaveAt} onChange={(e) => setLeaveAt(e.target.value)} className="field w-auto py-1.5" />
-              <span className="text-muted">today</span>
-            </label>
+            <div className="flex items-center gap-2 text-sm text-ink">
+              <label className="flex items-center gap-2">
+                <span className="sr-only">Departure time</span>
+                <input type="time" required value={leaveAt} onChange={(e) => setLeaveAt(e.target.value)} className="field w-auto py-1.5" />
+              </label>
+              <div className="inline-flex rounded-lg border border-line p-0.5" role="group" aria-label="Departure day">
+                {[false, true].map((t) => (
+                  <button
+                    key={String(t)}
+                    type="button"
+                    aria-pressed={tomorrow === t}
+                    onClick={() => setTomorrow(t)}
+                    className={`rounded-md px-3 py-1 text-sm font-medium ${tomorrow === t ? "bg-brand text-on-brand" : "text-muted hover:text-brand"}`}
+                  >
+                    {t ? "Tomorrow" : "Today"}
+                  </button>
+                ))}
+              </div>
+            </div>
           ) : null}
         </div>
       </fieldset>
@@ -137,7 +162,7 @@ function Results({ query }: { query: Query }) {
   if (!data) return <Loading label="Finding journeys" />;
 
   const detailHref = (o: Option) =>
-    `/journey${qs({ from: query.from, fromName: query.fromName, to: query.to, toName: query.toName, depart: data.departAt, option: o.signature })}`;
+    `/journey${qs({ from: query.from, fromName: query.fromName, to: query.to, toName: query.toName, depart: data.departIso || data.departAt, option: o.signature })}`;
 
   return (
     <section aria-labelledby="results-heading" className="space-y-4" aria-busy={loading}>
@@ -147,7 +172,7 @@ function Results({ query }: { query: Query }) {
             {data.from.name} to {data.to.name}
           </h2>
           <p className="text-sm text-muted">
-            Leaving {query.depart ? "at" : "now,"} {data.departAt}, {DAY_LABEL[data.day] ?? data.day}
+            {data.nextDay ? "First trips on" : `Leaving ${query.depart ? "at" : "now,"} ${data.departAt},`} {DAY_LABEL[data.day] ?? data.day}
             {data.weather ? `. ${Math.round(data.weather.tempC)} °C, feels like ${Math.round(data.weather.feelsLikeC)} °C` : ""}
           </p>
         </div>
@@ -157,6 +182,11 @@ function Results({ query }: { query: Query }) {
         </button>
       </div>
 
+      {data.nextDay ? (
+        <Notice tone="warning" title={`No service at ${data.requestedDepartAt ?? "this time"}`}>
+          Showing the first trips tomorrow morning. You can book them now.
+        </Notice>
+      ) : null}
       <DisruptionsBanner alerts={data.disruptions} />
       <HeatNotice weather={data.weather} />
       <NotRunningNotice items={data.notRunning} />

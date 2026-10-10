@@ -22,8 +22,7 @@ router.get('/plan', async (req, res) => {
   const from = parseEndpoint(req.query.from, req.query.fromName, 'from');
   const to = parseEndpoint(req.query.to, req.query.toName, 'to');
   const at = parseDepart(req.query.depart);
-  const closures = activeClosures(at);
-  const result = planner.plan(from, to, { at, closures, weather: await weatherAt(at) });
+  const result = planner.plan(from, to, { at, closuresAt: activeClosures, weather: await weatherAt(at) });
   res.json({ ...result, disruptions: publicClosures(at).filter((c) => c.status === 'active') });
 });
 

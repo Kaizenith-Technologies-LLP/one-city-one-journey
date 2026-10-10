@@ -125,6 +125,11 @@ export type PlanResult = {
   to: Place;
   departAt: string;
   day: string;
+  /** Exact time planned for; booking re-plans at this time. */
+  departIso: string;
+  /** True when nothing ran at the requested time and these are the next day's first trips. */
+  nextDay: boolean;
+  requestedDepartAt?: string;
   weather: Weather | null;
   notRunning: NotRunning[];
   disruptions: Alert[];

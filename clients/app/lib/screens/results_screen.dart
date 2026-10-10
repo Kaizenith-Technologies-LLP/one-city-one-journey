@@ -71,10 +71,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   void _openJourney(PlanResult r, JourneyOption o) => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => JourneyScreen(trip: _trip, option: o, departAt: r.departAt)),
+        MaterialPageRoute(builder: (_) => JourneyScreen(trip: _trip, option: o, departAt: r.bookingDepart)),
       );
 
-  void _book(PlanResult r, JourneyOption o) => startBooking(context, trip: _trip, option: o, departAt: r.departAt);
+  void _book(PlanResult r, JourneyOption o) => startBooking(context, trip: _trip, option: o, departAt: r.bookingDepart);
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               if (snap.hasData)
                 Expanded(
                   child: Text(
-                    'Planned for ${snap.data!.departAt}',
+                    snap.data!.nextDay ? 'First trips tomorrow' : 'Planned for ${snap.data!.departAt}',
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -123,6 +123,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
           final r = snap.data!;
           final alerts = r.disruptions.where((d) => !_dismissed.contains(d.id)).toList();
           final notices = <Widget>[
+            if (r.nextDay)
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.nightlight_round, color: scheme.primary),
+                  title: Text('No service at ${r.requestedDepartAt ?? 'this time'}'),
+                  subtitle: const Text('Showing the first trips tomorrow morning. You can book them now.'),
+                ),
+              ),
             if (r.weather?.heatMode == true) HeatNote(weather: r.weather!),
             ...alerts.map((d) => DisruptionCard(
                   key: ValueKey(d.id),

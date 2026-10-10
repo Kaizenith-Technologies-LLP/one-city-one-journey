@@ -95,7 +95,20 @@ export class Planner {
     return this.tripCache.get(key);
   }
 
-  /** Resolves an endpoint (stop id or {lat,lng}) into walking links to nearby stops. */
+  /**
+   * Stops served by a routable line that can be walked to from `p`: all within
+   * walking range, or the nearest few when none are.
+   */
+  #walkToService(p, exclude = new Set()) {
+    const ranked = [...this.network.stops.values()]
+      .filter((s) => s.lines.length && !exclude.has(s.id))
+      .map((s) => ({ stopId: s.id, distM: haversine(p, s) }))
+      .sort((a, b) => a.distM - b.distM);
+    const inRange = ranked.filter((r) => r.distM <= PLANNER.accessWalkMaxM);
+    return inRange.length ? inRange : ranked.slice(0, PLANNER.accessMinStops);
+  }
+
+  /** Resolves an endpoint (stop id or {lat,lng}) into walking links to stops with service. */
   resolveEndpoint(endpoint) {
     const { stops } = this.network;
     if (endpoint.stopId) {
@@ -103,14 +116,12 @@ export class Planner {
       if (!s) throw httpError(404, `Unknown stop: ${endpoint.stopId}`);
       // The stop itself plus its interchange neighbours, so a nearby mode can start or end the trip.
       const access = [{ stopId: s.id, distM: 0 }, ...this.walkLinks.get(s.id).map((w) => ({ stopId: w.to, distM: w.distM }))];
+      // When none of those has a routable line, walk to the nearest stops that do.
+      if (!access.some((a) => stops.get(a.stopId).lines.length)) access.push(...this.#walkToService(s, new Set(access.map((a) => a.stopId))));
       return { point: { name: s.name, lat: s.lat, lng: s.lng, stopId: s.id, mode: s.mode }, access };
     }
     const p = endpoint.point;
-    const ranked = [...stops.values()].map((s) => ({ stopId: s.id, distM: haversine(p, s) })).sort((a, b) => a.distM - b.distM);
-    // Stops within walking range; only if there are none, fall back to the nearest few.
-    const inRange = ranked.filter((r) => r.distM <= PLANNER.accessWalkMaxM);
-    const access = inRange.length ? inRange : ranked.slice(0, PLANNER.accessMinStops);
-    return { point: { name: endpoint.name ?? 'Selected location', lat: p.lat, lng: p.lng }, access };
+    return { point: { name: endpoint.name ?? 'Selected location', lat: p.lat, lng: p.lng }, access: this.#walkToService(p) };
   }
 
   /** Stops, lines and line sections closed by active closures. */
@@ -395,11 +406,25 @@ export class Planner {
 
   /**
    * Plans from `fromEndpoint` to `toEndpoint` leaving at `at` (a Date; IST
-   * clock), avoiding `closures` in force. `weather` ({feelsLikeC, ...} or
-   * null) switches on heat-aware ranking. Returns feasible options, the
-   * recommended one first.
+   * clock), avoiding the closures `closuresAt(date)` returns. `weather`
+   * ({feelsLikeC, ...} or null) switches on heat-aware ranking. When nothing
+   * runs after `at` that day, it plans the first trips of the next day and
+   * says so (`nextDay`, `requestedDepartAt`). Returns feasible options, the
+   * recommended one first; `departIso` is the time actually planned for.
    */
-  plan(fromEndpoint, toEndpoint, { at = new Date(), closures = [], weather = null } = {}) {
+  plan(fromEndpoint, toEndpoint, { at = new Date(), closuresAt = () => [], weather = null } = {}) {
+    const result = this.#planAt(fromEndpoint, toEndpoint, { at, closures: closuresAt(at), weather });
+    if (result.options.length) return { ...result, departIso: at.toISOString(), nextDay: false };
+
+    // Next IST midnight: the search then boards the first departures of the day.
+    const { min } = istClock(at);
+    const next = new Date(at.getTime() + (24 * 60 - min) * 60e3 - (at.getTime() % 60e3));
+    const tomorrow = this.#planAt(fromEndpoint, toEndpoint, { at: next, closures: closuresAt(next), weather: null });
+    if (!tomorrow.options.length) return { ...result, departIso: at.toISOString(), nextDay: false };
+    return { ...tomorrow, departIso: next.toISOString(), nextDay: true, requestedDepartAt: result.departAt, notRunning: result.notRunning };
+  }
+
+  #planAt(fromEndpoint, toEndpoint, { at, closures, weather }) {
     const origin = this.resolveEndpoint(fromEndpoint);
     const dest = this.resolveEndpoint(toEndpoint);
     if (origin.point.stopId && origin.point.stopId === dest.point.stopId) {

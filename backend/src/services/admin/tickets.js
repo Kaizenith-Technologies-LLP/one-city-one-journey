@@ -60,7 +60,9 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
   const from = endpoint(body.from, body.fromName, 'from');
   const to = endpoint(body.to, body.toName, 'to');
   const at = parseDepart(body.depart, now);
-  const { options, from: fromPoint, to: toPoint } = planner.plan(from, to, { at, closures: activeClosures(at) });
+  const { options, from: fromPoint, to: toPoint, departIso } = planner.plan(from, to, { at, closuresAt: activeClosures });
+  // Valid for VALID_HOURS from the planned departure (which may be the next morning), never from before booking.
+  const validFrom = Math.max(now.getTime(), Date.parse(departIso));
   if (!options.length) throw httpError(404, 'No transit option found for this trip');
   const opt =
     (body.signature && options.find((o) => o.signature === body.signature)) ||
@@ -96,7 +98,7 @@ export function issueTicket(body, { now = new Date(), channel = 'app' } = {}) {
       .filter((l) => l.type === 'ride')
       .map((l) => ({ mode: l.mode, operator: l.operator, lineId: l.lineId, line: l.lineShortName, lineName: l.lineName, color: l.color, from: l.from.name, fromStopId: l.from.stopId, to: l.to.name, toStopId: l.to.stopId, stops: l.stopCount, distanceKm: l.distanceKm, departTime: l.departTime, arriveTime: l.arriveTime })),
     createdAt,
-    validUntil: new Date(now.getTime() + VALID_HOURS * 3600e3).toISOString(),
+    validUntil: new Date(validFrom + VALID_HOURS * 3600e3).toISOString(),
     usedAt: null,
     cancelledAt: null,
     refundAmount: null,

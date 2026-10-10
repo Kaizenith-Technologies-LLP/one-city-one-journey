@@ -427,6 +427,11 @@ class PlanResult {
   final Place to;
   final String departAt;
   final String day;
+  /// The exact time the options were planned for; booking re-plans at this time.
+  final String departIso;
+  /// True when nothing ran at the requested time and these are the next day's first trips.
+  final bool nextDay;
+  final String? requestedDepartAt;
   final List<NotRunningLine> notRunning;
   final List<Disruption> disruptions;
   final Weather? weather;
@@ -437,17 +442,26 @@ class PlanResult {
     required this.to,
     required this.departAt,
     required this.day,
+    required this.departIso,
+    required this.nextDay,
+    required this.requestedDepartAt,
     required this.notRunning,
     required this.disruptions,
     required this.weather,
     required this.options,
   });
 
+  /// Departure value to send when booking or re-planning these exact options.
+  String get bookingDepart => departIso.isNotEmpty ? departIso : departAt;
+
   factory PlanResult.fromJson(Map<String, dynamic> j) => PlanResult(
         from: Place.fromJson(j['from']),
         to: Place.fromJson(j['to']),
         departAt: j['departAt'] ?? '',
         day: j['day'] ?? '',
+        departIso: j['departIso'] ?? '',
+        nextDay: j['nextDay'] == true,
+        requestedDepartAt: j['requestedDepartAt'],
         notRunning: _maps(j['notRunning']).map(NotRunningLine.fromJson).toList(),
         disruptions: _maps(j['disruptions']).map(Disruption.fromJson).toList(),
         weather: Weather.fromJsonOrNull(j['weather']),
