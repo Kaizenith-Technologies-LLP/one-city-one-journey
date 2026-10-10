@@ -10,3 +10,6 @@ out/
 # Admin-owned runtime state (tickets, audit, settings)
 backend/storage/*
 !backend/storage/.gitkeep
+
+# Built APKs are published as GitHub Releases
+dist/
