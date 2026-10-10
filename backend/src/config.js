@@ -1,0 +1,112 @@
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+/** Admin-owned state (settings, tickets, audit). Never inside data/. */
+export const STORAGE_DIR = process.env.STORAGE_DIR
+  ? path.resolve(process.env.STORAGE_DIR)
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../storage');
+export const SETTINGS_FILE = path.join(STORAGE_DIR, 'settings.json');
+
+/** Mode and operator metadata, plus tunable constants for the planner. */
+export const MODES = {
+  metro: {
+    label: 'Metro',
+    operator: 'GMRC',
+    operatorName: 'Gujarat Metro Rail Corporation',
+    color: '#1E5BC6',
+    defaultSpeedKmph: 33,
+    defaultHeadwayMin: 10,
+    // Transfers inside the paid area (e.g. Blue <-> Red) keep one ticket.
+    sharedTicketWithinMode: true,
+    // Relative cost per passenger-km, used by the fare-sharing split.
+    costWeight: 1.4,
+  },
+  brts: {
+    label: 'BRTS',
+    operator: 'AJL',
+    operatorName: 'Ahmedabad Janmarg Ltd (BRTS)',
+    color: '#D7263D',
+    defaultSpeedKmph: 22,
+    defaultHeadwayMin: 8,
+    sharedTicketWithinMode: true,
+    costWeight: 1.0,
+  },
+  amts: {
+    label: 'AMTS',
+    operator: 'AMTS',
+    operatorName: 'Ahmedabad Municipal Transport Service',
+    color: '#F4A300',
+    defaultSpeedKmph: 16,
+    defaultHeadwayMin: 15,
+    sharedTicketWithinMode: false,
+    costWeight: 0.8,
+  },
+  gsrtc: {
+    label: 'GSRTC',
+    operator: 'GSRTC',
+    operatorName: 'Gujarat State Road Transport Corporation',
+    color: '#2A9D8F',
+    defaultSpeedKmph: 25,
+    defaultHeadwayMin: 20,
+    sharedTicketWithinMode: false,
+    costWeight: 0.9,
+  },
+  gmcbus: {
+    label: 'Gandhinagar City Bus',
+    operator: 'GMC',
+    operatorName: 'Gandhinagar Municipal Corporation',
+    color: '#8E44AD',
+    defaultSpeedKmph: 18,
+    defaultHeadwayMin: 20,
+    sharedTicketWithinMode: false,
+    costWeight: 0.8,
+  },
+};
+
+export const PLANNER = {
+  walkSpeedMpm: 80, // 4.8 km/h
+  transferWalkMaxM: 500, // walking link between any two nearby stops
+  accessWalkMaxM: 1500, // walk from a raw lat/lng to the first stop
+  accessMinStops: 3, // always offer at least this many nearest stops
+  dwellMin: 0.5, // per intermediate stop
+  maxOptions: 5,
+};
+
+export const OVERLAP = {
+  nearM: 300, // different-mode stops this close are one hub
+  sameNameM: 800, // ...or this close when their names match
+};
+
+export const FARE_SHARE = {
+  integrationDiscount: 0.1, // off the summed fare when a trip uses 2+ operators
+  fareWeight: 0.5, // half of each share follows standalone fares, half follows weighted km
+};
+
+// Shipped values, so an override can always be reset.
+export const SETTINGS_DEFAULTS = {
+  integrationDiscount: FARE_SHARE.integrationDiscount,
+  fareWeight: FARE_SHARE.fareWeight,
+  costWeights: Object.fromEntries(Object.entries(MODES).map(([k, m]) => [k, m.costWeight])),
+};
+
+export function readSettingsFile() {
+  if (!existsSync(SETTINGS_FILE)) return {};
+  try {
+    return JSON.parse(readFileSync(SETTINGS_FILE, 'utf8').replace(/^﻿/, ''));
+  } catch (err) {
+    console.warn(`Ignoring unreadable ${SETTINGS_FILE}: ${err.message}`);
+    return {};
+  }
+}
+
+/** Merges admin overrides into FARE_SHARE and MODES in place (defaults first, so removed keys reset). */
+export function applySettings(overrides = readSettingsFile()) {
+  const o = { ...SETTINGS_DEFAULTS, ...overrides, costWeights: { ...SETTINGS_DEFAULTS.costWeights, ...overrides.costWeights } };
+  FARE_SHARE.integrationDiscount = o.integrationDiscount;
+  FARE_SHARE.fareWeight = o.fareWeight;
+  for (const [k, w] of Object.entries(o.costWeights)) if (MODES[k]) MODES[k].costWeight = w;
+  return o;
+}
+
+applySettings();

@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# Admin-owned runtime state (tickets, audit, settings)
+backend/storage/*
+!backend/storage/.gitkeep
