@@ -5,6 +5,7 @@ import '../api.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../widgets/mode_chip.dart';
+import '../widgets/state_views.dart';
 import '../widgets/transit_map.dart';
 
 const _typeLabels = {
@@ -14,7 +15,7 @@ const _typeLabels = {
   'penta': '5-mode interchange',
 };
 
-/// Overlapping stations: places where stops of different modes meet.
+/// Places where stops of different modes meet.
 class HubsScreen extends StatefulWidget {
   const HubsScreen({super.key});
 
@@ -31,11 +32,11 @@ class _HubsScreenState extends State<HubsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Overlapping stations'),
+        title: const Text('Interchanges'),
         actions: [
           IconButton(
-            tooltip: _showMap ? 'List' : 'Map',
-            icon: Icon(_showMap ? Icons.list : Icons.map_outlined),
+            tooltip: _showMap ? 'Show as list' : 'Show on map',
+            icon: Icon(_showMap ? Icons.view_list_outlined : Icons.map_outlined),
             onPressed: () => setState(() => _showMap = !_showMap),
           ),
         ],
@@ -43,35 +44,33 @@ class _HubsScreenState extends State<HubsScreen> {
       body: FutureBuilder<List<Hub>>(
         future: _future,
         builder: (context, snap) {
-          if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          if (snap.hasError) {
-            return Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(snap.error.toString()),
-                const SizedBox(height: 12),
-                FilledButton(onPressed: () => setState(() => _future = Api.instance.hubs()), child: const Text('Retry')),
-              ]),
+          if (snap.connectionState != ConnectionState.done) return const SkeletonCards(label: 'Loading interchanges');
+          if (snap.hasError) return ErrorView(error: snap.error!, onRetry: () => setState(() => _future = Api.instance.hubs()));
+          final all = snap.data!;
+          if (all.isEmpty) {
+            return const MessageView(
+              icon: Icons.hub_outlined,
+              title: 'No interchanges found',
+              message: 'No stations where different modes meet are in the network data yet.',
             );
           }
-          final hubs = snap.data!.where((h) => h.modes.length >= _minModes).toList();
-          final counts = <int, int>{};
-          for (final h in snap.data!) {
-            counts[h.modes.length] = (counts[h.modes.length] ?? 0) + 1;
-          }
+          final hubs = all.where((h) => h.modes.length >= _minModes).toList();
+          final threePlus = all.where((h) => h.modes.length >= 3).length;
           return Column(children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-              child: Row(children: [
-                ChoiceChip(label: Text('All (${snap.data!.length})'), selected: _minModes == 2, onSelected: (_) => setState(() => _minModes = 2)),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: Text('3+ modes (${snap.data!.where((h) => h.modes.length >= 3).length})'),
-                  selected: _minModes == 3,
-                  onSelected: (_) => setState(() => _minModes = 3),
-                ),
+              padding: const EdgeInsets.fromLTRB(Space.l, 0, Space.l, Space.s),
+              child: Wrap(spacing: Space.s, children: [
+                ChoiceChip(label: Text('All (${all.length})'), selected: _minModes == 2, onSelected: (_) => setState(() => _minModes = 2)),
+                ChoiceChip(label: Text('3+ modes ($threePlus)'), selected: _minModes == 3, onSelected: (_) => setState(() => _minModes = 3)),
               ]),
             ),
-            Expanded(child: _showMap ? _HubMap(hubs: hubs) : _HubList(hubs: hubs)),
+            Expanded(
+              child: hubs.isEmpty
+                  ? const MessageView(icon: Icons.hub_outlined, title: 'No interchanges with 3 or more modes')
+                  : _showMap
+                      ? _HubMap(hubs: hubs)
+                      : _HubList(hubs: hubs),
+            ),
           ]);
         },
       ),
@@ -79,33 +78,47 @@ class _HubsScreenState extends State<HubsScreen> {
   }
 }
 
+void _openHub(BuildContext context, Hub h) =>
+    Navigator.push(context, MaterialPageRoute(builder: (_) => HubDetailScreen(hub: h)));
+
 class _HubList extends StatelessWidget {
   final List<Hub> hubs;
   const _HubList({required this.hubs});
 
   @override
   Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      padding: const EdgeInsets.fromLTRB(Space.l, Space.xs, Space.l, Space.l),
       itemCount: hubs.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: Space.s),
       itemBuilder: (_, i) {
         final h = hubs[i];
+        final summary = '${_typeLabels[h.type] ?? h.type} · ${plural(h.lineCount, 'line')} · longest walk ${h.maxWalkM} m';
         return Card(
-          child: ListTile(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => HubDetailScreen(hub: h))),
-            title: Text(h.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Wrap(spacing: 4, runSpacing: 4, children: h.modes.map((m) => ModeChip(mode: m, dense: true)).toList()),
-                const SizedBox(height: 6),
-                Text('${_typeLabels[h.type] ?? h.type} · ${h.lineCount} lines · max walk ${h.maxWalkM} m',
-                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-              ]),
+          child: Semantics(
+            button: true,
+            label: '${h.name}. ${h.modes.map((m) => modeStyle(m).label).join(', ')}. $summary',
+            excludeSemantics: true,
+            child: InkWell(
+              onTap: () => _openHub(context, h),
+              child: Padding(
+                padding: const EdgeInsets.all(Space.l),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(h.name, style: text.titleMedium),
+                      const SizedBox(height: Space.s),
+                      Wrap(spacing: Space.xs, runSpacing: Space.xs, children: h.modes.map((m) => ModeChip(mode: m, dense: true)).toList()),
+                      const SizedBox(height: Space.s),
+                      Text(summary, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    ]),
+                  ),
+                  Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+                ]),
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
           ),
         );
       },
@@ -120,24 +133,32 @@ class _HubMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final markers = hubs.map((h) {
-      final size = 14.0 + h.modes.length * 5;
+      final size = 18.0 + h.modes.length * 4;
+      final scheme = Theme.of(context).colorScheme;
       return Marker(
         point: h.point,
-        width: size,
-        height: size,
-        child: GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => HubDetailScreen(hub: h))),
-          child: Tooltip(
-            message: h.name,
-            child: Container(
-              decoration: BoxDecoration(
-                color: modeStyle(h.modes.first).color,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: const [BoxShadow(blurRadius: 3, color: Colors.black26)],
-              ),
-              child: Center(
-                child: Text('${h.modes.length}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+        width: 48,
+        height: 48,
+        child: Semantics(
+          button: true,
+          label: '${h.name}, ${plural(h.modes.length, 'mode')}',
+          excludeSemantics: true,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _openHub(context, h),
+            child: Center(
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: scheme.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.paper, width: 2),
+                  boxShadow: [BoxShadow(blurRadius: 3, color: AppColors.ink.withValues(alpha: 0.3))],
+                ),
+                child: Center(
+                  child: Text('${h.modes.length}', style: TextStyle(color: scheme.onPrimary, fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
               ),
             ),
           ),
@@ -155,30 +176,46 @@ class HubDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final h = hub;
-    final markers = h.members.map((m) => dotMarker(m.point, modeStyle(m.mode).color, size: 20)).toList();
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final markers = h.members.map((m) => dotMarker(m.point, AppColors.primary, size: 20)).toList();
     final polylines = [
       for (var i = 1; i < h.members.length; i++)
-        Polyline(points: [h.members.first.point, h.members[i].point], color: Colors.grey.shade700, strokeWidth: 3, pattern: StrokePattern.dotted()),
+        Polyline(points: [h.members.first.point, h.members[i].point], color: AppColors.neutral, strokeWidth: 3, pattern: StrokePattern.dashed(segments: const [8, 6])),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(h.name)),
       body: Column(children: [
         SizedBox(
-          height: MediaQuery.sizeOf(context).height * 0.35,
-          child: TransitMap(markers: markers, polylines: polylines, fitPoints: h.members.length > 1 ? h.members.map((m) => m.point).toList() : [h.point]),
+          height: MediaQuery.sizeOf(context).height * 0.3,
+          child: TransitMap(
+            markers: markers,
+            polylines: polylines,
+            fitPoints: h.members.length > 1 ? h.members.map((m) => m.point).toList() : [h.point],
+          ),
         ),
         Expanded(
-          child: ListView(padding: const EdgeInsets.all(16), children: [
-            Text(_typeLabels[h.type] ?? h.type, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text('${h.members.length} stops · ${h.lineCount} lines · longest transfer walk ${h.maxWalkM} m (~${h.maxWalkMin.toStringAsFixed(0)} min)'),
-            const SizedBox(height: 12),
-            ...h.members.map((m) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(backgroundColor: modeStyle(m.mode).color, child: Icon(modeStyle(m.mode).icon, color: Colors.white, size: 20)),
-                  title: Text(m.name),
-                  subtitle: Text('${modeStyle(m.mode).label} · ${m.lines.join(', ')}'),
-                )),
+          child: ListView(padding: const EdgeInsets.all(Space.l), children: [
+            Semantics(header: true, child: Text(_typeLabels[h.type] ?? h.type, style: text.titleMedium)),
+            const SizedBox(height: Space.xs),
+            Text(
+              '${plural(h.members.length, 'stop')} · ${plural(h.lineCount, 'line')} · '
+              'longest transfer walk ${h.maxWalkM} m (about ${h.maxWalkMin.toStringAsFixed(0)} min)',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: Space.m),
+            Card(
+              child: Column(
+                children: h.members.map((m) {
+                  final st = modeStyle(m.mode);
+                  return ListTile(
+                    leading: CircleAvatar(backgroundColor: scheme.secondaryContainer, child: Icon(st.icon, color: scheme.onSecondaryContainer, size: 20)),
+                    title: Text(m.name),
+                    subtitle: Text(m.lines.isEmpty ? st.label : '${st.label} · ${m.lines.join(', ')}'),
+                  );
+                }).toList(),
+              ),
+            ),
           ]),
         ),
       ]),

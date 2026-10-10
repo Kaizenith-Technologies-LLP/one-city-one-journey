@@ -2,7 +2,10 @@ import 'package:latlong2/latlong.dart';
 
 double _d(dynamic v) => (v as num?)?.toDouble() ?? 0;
 int _i(dynamic v) => (v as num?)?.round() ?? 0;
+int? _iOrNull(dynamic v) => (v as num?)?.round();
+String? _s(dynamic v) => v?.toString();
 List<String> _strings(dynamic v) => (v as List? ?? const []).map((e) => e.toString()).toList();
+List<Map<String, dynamic>> _maps(dynamic v) => (v as List? ?? const []).cast<Map<String, dynamic>>();
 
 class Stop {
   final String id;
@@ -35,123 +38,152 @@ class Stop {
         lng: _d(j['lng']),
         lines: _strings(j['lines']),
         hubId: j['hubId'],
-        distanceM: j['distanceM'] == null ? null : _i(j['distanceM']),
+        distanceM: _iOrNull(j['distanceM']),
       );
 }
 
-/// A start or destination: either a stop or a raw point picked on the map.
+/// A start, destination or stop along a journey: a stop, or a raw point picked on the map.
 class Place {
   final String label;
   final String? stopId;
   final String? mode;
+  final String? hubId;
   final LatLng point;
 
-  const Place({required this.label, required this.point, this.stopId, this.mode});
+  const Place({required this.label, required this.point, this.stopId, this.mode, this.hubId});
 
-  factory Place.fromStop(Stop s) => Place(label: s.name, stopId: s.id, mode: s.mode, point: s.latLng);
+  factory Place.fromStop(Stop s) => Place(label: s.name, stopId: s.id, mode: s.mode, hubId: s.hubId, point: s.latLng);
 
-  /// Query value accepted by /api/plan: a stop id or "lat,lng".
+  factory Place.fromJson(Map<String, dynamic>? j) => Place(
+        label: j?['name'] ?? '',
+        stopId: j?['stopId'],
+        mode: j?['mode'],
+        hubId: j?['hubId'],
+        point: LatLng(_d(j?['lat']), _d(j?['lng'])),
+      );
+
+  /// Value accepted by /api/plan and /api/tickets: a stop id or "lat,lng".
   String get query => stopId ?? '${point.latitude.toStringAsFixed(6)},${point.longitude.toStringAsFixed(6)}';
+
+  bool sameAs(Place other) => query == other.query;
+}
+
+/// What the user asked for: from, to and an optional departure ("HH:MM"; null = leave now).
+class TripRequest {
+  final Place from;
+  final Place to;
+  final String? depart;
+  const TripRequest(this.from, this.to, {this.depart});
+
+  TripRequest withDepart(String? value) => TripRequest(from, to, depart: value);
+  TripRequest swapped() => TripRequest(to, from, depart: depart);
+
+  bool sameTrip(TripRequest other) => from.sameAs(other.from) && to.sameAs(other.to);
 }
 
 class PathPoint {
+  final String? stopId;
   final String name;
   final LatLng point;
-  const PathPoint(this.name, this.point);
+  const PathPoint(this.stopId, this.name, this.point);
 }
 
 class Leg {
   final String type; // walk | ride
+  final String? kind; // walk: access | transfer | egress
   final String instruction;
-  final String fromName;
-  final String toName;
-  final LatLng from;
-  final LatLng to;
-  final String? toHubId;
+  final Place from;
+  final Place to;
+  final String departTime;
+  final String arriveTime;
   // walk
   final int distanceM;
   final int durationMin;
+  final String? heatWarning;
   // ride
   final String? mode;
   final String? operator;
+  final String? lineId;
   final String? lineName;
   final String? lineShortName;
-  final String? color;
   final String? towards;
   final int stopCount;
   final double distanceKm;
   final int waitMin;
   final int rideMin;
-  final int headwayMin;
+  final int? headwayMin;
   final List<PathPoint> path;
 
   const Leg({
     required this.type,
     required this.instruction,
-    required this.fromName,
-    required this.toName,
     required this.from,
     required this.to,
-    this.toHubId,
+    required this.departTime,
+    required this.arriveTime,
+    this.kind,
     this.distanceM = 0,
     this.durationMin = 0,
+    this.heatWarning,
     this.mode,
     this.operator,
+    this.lineId,
     this.lineName,
     this.lineShortName,
-    this.color,
     this.towards,
     this.stopCount = 0,
     this.distanceKm = 0,
     this.waitMin = 0,
     this.rideMin = 0,
-    this.headwayMin = 0,
+    this.headwayMin,
     this.path = const [],
   });
 
   bool get isWalk => type == 'walk';
+  bool get isTransfer => kind == 'transfer';
 
-  List<LatLng> get points => path.isNotEmpty ? path.map((p) => p.point).toList() : [from, to];
+  List<LatLng> get points => path.isNotEmpty ? path.map((p) => p.point).toList() : [from.point, to.point];
 
-  factory Leg.fromJson(Map<String, dynamic> j) {
-    final f = j['from'] as Map<String, dynamic>;
-    final t = j['to'] as Map<String, dynamic>;
-    return Leg(
-      type: j['type'],
-      instruction: j['instruction'] ?? '',
-      fromName: f['name'] ?? '',
-      toName: t['name'] ?? '',
-      from: LatLng(_d(f['lat']), _d(f['lng'])),
-      to: LatLng(_d(t['lat']), _d(t['lng'])),
-      toHubId: t['hubId'],
-      distanceM: _i(j['distanceM']),
-      durationMin: _i(j['durationMin']),
-      mode: j['mode'],
-      operator: j['operator'],
-      lineName: j['lineName'],
-      lineShortName: j['lineShortName'],
-      color: j['color'],
-      towards: j['towards'],
-      stopCount: _i(j['stopCount']),
-      distanceKm: _d(j['distanceKm']),
-      waitMin: _i(j['waitMin']),
-      rideMin: _i(j['rideMin']),
-      headwayMin: _i(j['headwayMin']),
-      path: (j['path'] as List? ?? const [])
-          .map((p) => PathPoint(p['name'] ?? '', LatLng(_d(p['lat']), _d(p['lng']))))
-          .toList(),
-    );
-  }
+  /// Stops passed between boarding and alighting.
+  List<PathPoint> get intermediateStops => path.length > 2 ? path.sublist(1, path.length - 1) : const [];
+
+  factory Leg.fromJson(Map<String, dynamic> j) => Leg(
+        type: j['type'] ?? 'walk',
+        kind: j['kind'],
+        instruction: j['instruction'] ?? '',
+        from: Place.fromJson(j['from']),
+        to: Place.fromJson(j['to']),
+        departTime: j['departTime'] ?? '',
+        arriveTime: j['arriveTime'] ?? '',
+        distanceM: _i(j['distanceM']),
+        durationMin: _i(j['durationMin']),
+        heatWarning: _s(j['heatWarning']),
+        mode: j['mode'],
+        operator: j['operator'],
+        lineId: j['lineId'],
+        lineName: j['lineName'],
+        lineShortName: j['lineShortName'],
+        towards: j['towards'],
+        stopCount: _i(j['stopCount']),
+        distanceKm: _d(j['distanceKm']),
+        waitMin: _i(j['waitMin']),
+        rideMin: _i(j['rideMin']),
+        headwayMin: _iOrNull(j['headwayMin']),
+        path: _maps(j['path'])
+            .map((p) => PathPoint(p['stopId'], p['name'] ?? '', LatLng(_d(p['lat']), _d(p['lng']))))
+            .toList(),
+      );
 }
 
-class Ticket {
+/// One operator's standalone ticket for part of a journey.
+class LegFare {
   final String mode;
   final String operator;
   final double km;
   final int fare;
-  const Ticket(this.mode, this.operator, this.km, this.fare);
+  const LegFare(this.mode, this.operator, this.km, this.fare);
 
-  factory Ticket.fromJson(Map<String, dynamic> j) => Ticket(j['mode'], j['operator'], _d(j['km']), _i(j['fare']));
+  factory LegFare.fromJson(Map<String, dynamic> j) => LegFare(j['mode'] ?? '', j['operator'] ?? '', _d(j['km']), _i(j['fare']));
 }
 
 class OperatorShare {
@@ -165,9 +197,9 @@ class OperatorShare {
   const OperatorShare(this.operator, this.operatorName, this.mode, this.standaloneFare, this.km, this.sharePct, this.amount);
 
   factory OperatorShare.fromJson(Map<String, dynamic> j) => OperatorShare(
-        j['operator'],
-        j['operatorName'] ?? j['operator'],
-        j['mode'],
+        j['operator'] ?? '',
+        j['operatorName'] ?? j['operator'] ?? '',
+        j['mode'] ?? '',
         _i(j['standaloneFare']),
         _d(j['km']),
         _d(j['sharePct']),
@@ -184,19 +216,23 @@ class FareSplit {
   final List<OperatorShare> shares;
   const FareSplit(this.standaloneFare, this.integratedFare, this.discountPct, this.savings, this.method, this.shares);
 
-  factory FareSplit.fromJson(Map<String, dynamic> j) => FareSplit(
-        _i(j['standaloneFare']),
-        _i(j['integratedFare']),
-        _i(j['discountPct']),
-        _i(j['savings']),
-        j['method'] ?? '',
-        (j['shares'] as List).map((e) => OperatorShare.fromJson(e)).toList(),
+  factory FareSplit.fromJson(Map<String, dynamic>? j) => FareSplit(
+        _i(j?['standaloneFare']),
+        _i(j?['integratedFare']),
+        _i(j?['discountPct']),
+        _i(j?['savings']),
+        j?['method'] ?? '',
+        _maps(j?['shares']).map(OperatorShare.fromJson).toList(),
       );
 }
 
 class JourneyOption {
   final String id;
   final List<String> tags;
+  final String? reason;
+  final String signature;
+  final String leaveTime;
+  final String arriveTime;
   final int totalMin;
   final int rideMin;
   final int waitMin;
@@ -205,15 +241,20 @@ class JourneyOption {
   final double distanceKm;
   final int transfers;
   final List<String> modes;
+  final List<String> operators;
   final int fare;
   final int standaloneFare;
-  final List<Ticket> tickets;
+  final List<LegFare> tickets;
   final FareSplit fareSplit;
   final List<Leg> legs;
 
   const JourneyOption({
     required this.id,
     required this.tags,
+    required this.reason,
+    required this.signature,
+    required this.leaveTime,
+    required this.arriveTime,
     required this.totalMin,
     required this.rideMin,
     required this.waitMin,
@@ -222,6 +263,7 @@ class JourneyOption {
     required this.distanceKm,
     required this.transfers,
     required this.modes,
+    required this.operators,
     required this.fare,
     required this.standaloneFare,
     required this.tickets,
@@ -229,11 +271,17 @@ class JourneyOption {
     required this.legs,
   });
 
+  bool get isRecommended => tags.contains('recommended');
   List<Leg> get rides => legs.where((l) => !l.isWalk).toList();
+  int get savings => fareSplit.savings;
 
   factory JourneyOption.fromJson(Map<String, dynamic> j) => JourneyOption(
-        id: j['id'],
+        id: j['id'] ?? '',
         tags: _strings(j['tags']),
+        reason: _s(j['reason']),
+        signature: j['signature'] ?? '',
+        leaveTime: j['leaveTime'] ?? '',
+        arriveTime: j['arriveTime'] ?? '',
         totalMin: _i(j['totalMin']),
         rideMin: _i(j['rideMin']),
         waitMin: _i(j['waitMin']),
@@ -242,24 +290,270 @@ class JourneyOption {
         distanceKm: _d(j['distanceKm']),
         transfers: _i(j['transfers']),
         modes: _strings(j['modes']),
+        operators: _strings(j['operators']),
         fare: _i(j['fare']),
         standaloneFare: _i(j['standaloneFare']),
-        tickets: (j['tickets'] as List).map((e) => Ticket.fromJson(e)).toList(),
+        tickets: _maps(j['tickets']).map(LegFare.fromJson).toList(),
         fareSplit: FareSplit.fromJson(j['fareSplit']),
-        legs: (j['legs'] as List).map((e) => Leg.fromJson(e)).toList(),
+        legs: _maps(j['legs']).map(Leg.fromJson).toList(),
       );
 }
 
+/// A line that cannot be boarded around the requested time.
+class NotRunningLine {
+  final String lineId;
+  final String name;
+  final String mode;
+  final String status; // ended | notStarted | noServiceToday
+  final String? lastDeparture;
+  final String? firstDeparture;
+
+  const NotRunningLine({
+    required this.lineId,
+    required this.name,
+    required this.mode,
+    required this.status,
+    this.lastDeparture,
+    this.firstDeparture,
+  });
+
+  String get explanation => switch (status) {
+        'ended' => lastDeparture == null ? 'Finished for today' : 'Last departure left at $lastDeparture',
+        'notStarted' => firstDeparture == null ? 'Not started yet' : 'First departure at $firstDeparture',
+        _ => 'No service today',
+      };
+
+  factory NotRunningLine.fromJson(Map<String, dynamic> j) => NotRunningLine(
+        lineId: j['lineId'] ?? '',
+        name: j['name'] ?? '',
+        mode: j['mode'] ?? '',
+        status: j['status'] ?? '',
+        lastDeparture: _s(j['lastDeparture']),
+        firstDeparture: _s(j['firstDeparture']),
+      );
+}
+
+/// A closure of a line, a section or a stop, with advisories in English, Gujarati and Hindi.
+class Disruption {
+  final String id;
+  final String type; // line | section | stop
+  final String title;
+  final String status;
+  final DateTime? startsAt;
+  final DateTime? endsAt;
+  final String en;
+  final String gu;
+  final String hi;
+  final String whatsapp;
+  final List<String> affectedLines;
+
+  const Disruption({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.status,
+    required this.startsAt,
+    required this.endsAt,
+    required this.en,
+    required this.gu,
+    required this.hi,
+    required this.whatsapp,
+    required this.affectedLines,
+  });
+
+  /// Advisory text for a language code (en, gu, hi), falling back to English.
+  String text(String lang) {
+    final t = switch (lang) { 'gu' => gu, 'hi' => hi, _ => en };
+    return t.isEmpty ? en : t;
+  }
+
+  bool get isActive => status == 'active';
+
+  factory Disruption.fromJson(Map<String, dynamic> j) => Disruption(
+        id: j['id']?.toString() ?? '',
+        type: j['type'] ?? '',
+        title: j['title'] ?? '',
+        status: j['status'] ?? '',
+        startsAt: DateTime.tryParse(j['startsAt']?.toString() ?? '')?.toLocal(),
+        endsAt: DateTime.tryParse(j['endsAt']?.toString() ?? '')?.toLocal(),
+        en: j['en']?.toString() ?? '',
+        gu: j['gu']?.toString() ?? '',
+        hi: j['hi']?.toString() ?? '',
+        whatsapp: j['whatsapp']?.toString() ?? '',
+        affectedLines: _strings(j['affectedLines']),
+      );
+}
+
+class Weather {
+  final String? time;
+  final double tempC;
+  final double feelsLikeC;
+  final double precipMm;
+  final String source;
+  final bool heatMode;
+
+  const Weather({
+    required this.time,
+    required this.tempC,
+    required this.feelsLikeC,
+    required this.precipMm,
+    required this.source,
+    required this.heatMode,
+  });
+
+  static Weather? fromJsonOrNull(dynamic j) => j is Map<String, dynamic>
+      ? Weather(
+          time: _s(j['time']),
+          tempC: _d(j['tempC']),
+          feelsLikeC: _d(j['feelsLikeC']),
+          precipMm: _d(j['precipMm']),
+          source: j['source']?.toString() ?? '',
+          heatMode: j['heatMode'] == true,
+        )
+      : null;
+}
+
+class WeatherNow {
+  final Weather? now;
+  final double? thresholdC;
+  const WeatherNow(this.now, this.thresholdC);
+
+  factory WeatherNow.fromJson(Map<String, dynamic>? j) =>
+      WeatherNow(Weather.fromJsonOrNull(j?['now']), (j?['thresholdC'] as num?)?.toDouble());
+}
+
 class PlanResult {
-  final String fromName;
-  final String toName;
+  final Place from;
+  final Place to;
+  final String departAt;
+  final String day;
+  final List<NotRunningLine> notRunning;
+  final List<Disruption> disruptions;
+  final Weather? weather;
   final List<JourneyOption> options;
-  const PlanResult(this.fromName, this.toName, this.options);
+
+  const PlanResult({
+    required this.from,
+    required this.to,
+    required this.departAt,
+    required this.day,
+    required this.notRunning,
+    required this.disruptions,
+    required this.weather,
+    required this.options,
+  });
 
   factory PlanResult.fromJson(Map<String, dynamic> j) => PlanResult(
-        j['from']?['name'] ?? '',
-        j['to']?['name'] ?? '',
-        (j['options'] as List).map((e) => JourneyOption.fromJson(e)).toList(),
+        from: Place.fromJson(j['from']),
+        to: Place.fromJson(j['to']),
+        departAt: j['departAt'] ?? '',
+        day: j['day'] ?? '',
+        notRunning: _maps(j['notRunning']).map(NotRunningLine.fromJson).toList(),
+        disruptions: _maps(j['disruptions']).map(Disruption.fromJson).toList(),
+        weather: Weather.fromJsonOrNull(j['weather']),
+        options: _maps(j['options']).map(JourneyOption.fromJson).toList(),
+      );
+}
+
+/// A ride on an issued ticket.
+class TicketLeg {
+  final String mode;
+  final String? line;
+  final String? lineName;
+  final String from;
+  final String to;
+  final int stops;
+  final double distanceKm;
+  final String? departTime;
+  final String? arriveTime;
+
+  const TicketLeg({
+    required this.mode,
+    required this.from,
+    required this.to,
+    this.line,
+    this.lineName,
+    this.stops = 0,
+    this.distanceKm = 0,
+    this.departTime,
+    this.arriveTime,
+  });
+
+  factory TicketLeg.fromJson(Map<String, dynamic> j) => TicketLeg(
+        mode: j['mode'] ?? '',
+        line: _s(j['line']),
+        lineName: _s(j['lineName']),
+        from: j['from']?.toString() ?? '',
+        to: j['to']?.toString() ?? '',
+        stops: _i(j['stops']),
+        distanceKm: _d(j['distanceKm']),
+        departTime: _s(j['departTime']),
+        arriveTime: _s(j['arriveTime']),
+      );
+}
+
+/// An integrated ticket issued by POST /api/tickets.
+class Ticket {
+  final String id;
+  final String status; // active | used | cancelled | expired
+  final int fare;
+  final int standaloneFare;
+  final int savings;
+  final Place from;
+  final Place to;
+  final String? signature;
+  final int totalMin;
+  final int transfers;
+  final List<String> modes;
+  final List<String> operators;
+  final List<OperatorShare> split;
+  final List<TicketLeg> legs;
+  final String qr;
+  final DateTime? createdAt;
+  final DateTime? validUntil;
+
+  const Ticket({
+    required this.id,
+    required this.status,
+    required this.fare,
+    required this.standaloneFare,
+    required this.savings,
+    required this.from,
+    required this.to,
+    required this.signature,
+    required this.totalMin,
+    required this.transfers,
+    required this.modes,
+    required this.operators,
+    required this.split,
+    required this.legs,
+    required this.qr,
+    required this.createdAt,
+    required this.validUntil,
+  });
+
+  /// Status as of [now]: an active ticket past its validity reads as expired.
+  String statusAt(DateTime now) =>
+      status == 'active' && validUntil != null && now.isAfter(validUntil!) ? 'expired' : status;
+
+  factory Ticket.fromJson(Map<String, dynamic> j) => Ticket(
+        id: j['id'] ?? '',
+        status: j['status'] ?? '',
+        fare: _i(j['fare']),
+        standaloneFare: _i(j['standaloneFare']),
+        savings: _i(j['savings']),
+        from: Place.fromJson(j['from']),
+        to: Place.fromJson(j['to']),
+        signature: _s(j['signature']),
+        totalMin: _i(j['totalMin']),
+        transfers: _i(j['transfers']),
+        modes: _strings(j['modes']),
+        operators: _strings(j['operators']),
+        split: _maps(j['split']).map(OperatorShare.fromJson).toList(),
+        legs: _maps(j['legs']).map(TicketLeg.fromJson).toList(),
+        qr: j['qr']?.toString() ?? '',
+        createdAt: DateTime.tryParse(j['createdAt']?.toString() ?? '')?.toLocal(),
+        validUntil: DateTime.tryParse(j['validUntil']?.toString() ?? '')?.toLocal(),
       );
 }
 
@@ -296,16 +590,16 @@ class Hub {
   });
 
   factory Hub.fromJson(Map<String, dynamic> j) => Hub(
-        id: j['id'],
-        name: j['name'],
+        id: j['id'] ?? '',
+        name: j['name'] ?? '',
         point: LatLng(_d(j['lat']), _d(j['lng'])),
         modes: _strings(j['modes']),
         type: j['type'] ?? '',
         lineCount: _i(j['lineCount']),
         maxWalkM: _i(j['maxWalkM']),
         maxWalkMin: _d(j['maxWalkMin']),
-        members: (j['members'] as List)
-            .map((m) => HubMember(m['stopId'], m['name'], m['mode'], LatLng(_d(m['lat']), _d(m['lng'])), _strings(m['lines'])))
+        members: _maps(j['members'])
+            .map((m) => HubMember(m['stopId'] ?? '', m['name'] ?? '', m['mode'] ?? '', LatLng(_d(m['lat']), _d(m['lng'])), _strings(m['lines'])))
             .toList(),
       );
 }
@@ -334,9 +628,9 @@ class OperatorSettlement {
   });
 
   factory OperatorSettlement.fromJson(Map<String, dynamic> j) => OperatorSettlement(
-        operator: j['operator'],
-        operatorName: j['operatorName'] ?? j['operator'],
-        mode: j['mode'],
+        operator: j['operator'] ?? '',
+        operatorName: j['operatorName'] ?? j['operator'] ?? '',
+        mode: j['mode'] ?? '',
         trips: _i(j['trips']),
         passengerKm: _d(j['passengerKm']),
         standaloneRevenue: _d(j['standaloneRevenue']),
@@ -383,7 +677,7 @@ class Settlement {
       integrationDiscountPct: _i(rules['integrationDiscountPct']),
       fareWeightPct: _i(rules['fareWeightPct']),
       costWeights: (rules['costWeights'] as Map<String, dynamic>? ?? const {}).map((k, v) => MapEntry(k, _d(v))),
-      operators: (j['operators'] as List).map((e) => OperatorSettlement.fromJson(e)).toList(),
+      operators: _maps(j['operators']).map(OperatorSettlement.fromJson).toList(),
     );
   }
 }

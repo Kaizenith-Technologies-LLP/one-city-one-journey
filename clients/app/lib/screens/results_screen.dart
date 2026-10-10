@@ -2,100 +2,192 @@ import 'package:flutter/material.dart';
 
 import '../api.dart';
 import '../models.dart';
+import '../store.dart';
 import '../theme.dart';
+import '../widgets/booking_sheet.dart';
+import '../widgets/depart_chip.dart';
+import '../widgets/disruption_card.dart';
+import '../widgets/heat_note.dart';
 import '../widgets/mode_chip.dart';
+import '../widgets/route_card.dart';
+import '../widgets/state_views.dart';
 import 'journey_screen.dart';
 
-enum SortBy { best, fastest, cheapest, leastWalking }
+enum _Filter { recommended, fastest, fewestTransfers, leastWalking, cheapest }
+
+extension on _Filter {
+  String get label => tagLabels[name]!;
+}
 
 class ResultsScreen extends StatefulWidget {
-  final Place from;
-  final Place to;
-  const ResultsScreen({super.key, required this.from, required this.to});
+  final TripRequest trip;
+  const ResultsScreen({super.key, required this.trip});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
 }
 
 class _ResultsScreenState extends State<ResultsScreen> {
-  late Future<PlanResult> _future = Api.instance.plan(widget.from, widget.to);
-  SortBy _sort = SortBy.best;
+  late TripRequest _trip = widget.trip;
+  late Future<PlanResult> _future = Api.instance.plan(_trip);
+  _Filter _filter = _Filter.recommended;
+  final Set<String> _dismissed = {};
 
-  List<JourneyOption> _sorted(List<JourneyOption> options) {
-    final list = [...options];
-    int byTime(JourneyOption a, JourneyOption b) => a.totalMin.compareTo(b.totalMin);
-    switch (_sort) {
-      case SortBy.best:
+  void _reload([TripRequest? trip]) => setState(() {
+        if (trip != null) _trip = trip;
+        _future = Api.instance.plan(_trip);
+      });
+
+  void _swap() {
+    final t = _trip.swapped();
+    AppStore.instance.recentTrips.add(t);
+    _reload(t);
+  }
+
+  Future<void> _changeTime() async {
+    final choice = await pickDeparture(context, _trip.depart);
+    if (choice != null) _reload(_trip.withDepart(choice.value));
+  }
+
+  List<JourneyOption> _sorted(PlanResult r) {
+    final base = clockToMin(r.departAt) ?? 0;
+    int rel(String t) => ((clockToMin(t) ?? base) - base + 1440) % 1440;
+    int arrive(JourneyOption a, JourneyOption b) => rel(a.arriveTime).compareTo(rel(b.arriveTime));
+    final list = [...r.options];
+    switch (_filter) {
+      case _Filter.recommended:
         break;
-      case SortBy.fastest:
-        list.sort(byTime);
-      case SortBy.cheapest:
-        list.sort((a, b) => a.fare.compareTo(b.fare) != 0 ? a.fare.compareTo(b.fare) : byTime(a, b));
-      case SortBy.leastWalking:
-        list.sort((a, b) => a.walkM.compareTo(b.walkM) != 0 ? a.walkM.compareTo(b.walkM) : byTime(a, b));
+      case _Filter.fastest:
+        list.sort((a, b) => arrive(a, b) != 0 ? arrive(a, b) : a.totalMin.compareTo(b.totalMin));
+      case _Filter.fewestTransfers:
+        list.sort((a, b) => a.transfers != b.transfers ? a.transfers.compareTo(b.transfers) : arrive(a, b));
+      case _Filter.leastWalking:
+        list.sort((a, b) => a.walkM != b.walkM ? a.walkM.compareTo(b.walkM) : arrive(a, b));
+      case _Filter.cheapest:
+        list.sort((a, b) => a.fare != b.fare ? a.fare.compareTo(b.fare) : arrive(a, b));
     }
     return list;
   }
 
+  void _openJourney(PlanResult r, JourneyOption o) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => JourneyScreen(trip: _trip, option: o, departAt: r.departAt)),
+      );
+
+  void _book(PlanResult r, JourneyOption o) => startBooking(context, trip: _trip, option: o, departAt: r.departAt);
+
   @override
   Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(widget.from.label, style: const TextStyle(fontSize: 15), overflow: TextOverflow.ellipsis),
-          Text('to ${widget.to.label}', style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
-        ]),
+        titleSpacing: 0,
+        title: Semantics(
+          label: 'Routes from ${_trip.from.label} to ${_trip.to.label}',
+          excludeSemantics: true,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(_trip.from.label, style: text.titleMedium, overflow: TextOverflow.ellipsis),
+            Text('to ${_trip.to.label}', style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant), overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+        actions: [IconButton(tooltip: 'Reverse trip', icon: const Icon(Icons.swap_vert), onPressed: _swap)],
       ),
       body: FutureBuilder<PlanResult>(
         future: _future,
         builder: (context, snap) {
-          if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          if (snap.hasError) {
-            return _Message(
-              icon: Icons.cloud_off,
-              text: snap.error.toString(),
-              action: FilledButton(
-                onPressed: () => setState(() => _future = Api.instance.plan(widget.from, widget.to)),
-                child: const Text('Retry'),
-              ),
-            );
+          final header = Padding(
+            padding: const EdgeInsets.fromLTRB(Space.l, 0, Space.l, Space.xs),
+            child: Row(children: [
+              DepartChip(depart: _trip.depart, onChanged: (v) => _reload(_trip.withDepart(v))),
+              const SizedBox(width: Space.s),
+              if (snap.hasData)
+                Expanded(
+                  child: Text(
+                    'Planned for ${snap.data!.departAt}',
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+            ]),
+          );
+          if (snap.connectionState != ConnectionState.done) {
+            return Column(children: [
+              header,
+              const Expanded(child: SkeletonCards(label: 'Finding routes')),
+            ]);
           }
-          final options = _sorted(snap.data!.options);
-          if (options.isEmpty) return const _Message(icon: Icons.route, text: 'No transit route found between these places.');
+          if (snap.hasError) {
+            return Column(children: [header, Expanded(child: ErrorView(error: snap.error!, onRetry: _reload))]);
+          }
+          final r = snap.data!;
+          final alerts = r.disruptions.where((d) => !_dismissed.contains(d.id)).toList();
+          final notices = <Widget>[
+            if (r.weather?.heatMode == true) HeatNote(weather: r.weather!),
+            ...alerts.map((d) => DisruptionCard(
+                  key: ValueKey(d.id),
+                  disruption: d,
+                  onDismiss: () => setState(() => _dismissed.add(d.id)),
+                )),
+          ];
+          if (r.options.isEmpty) {
+            return Column(children: [
+              header,
+              Expanded(child: _NoRoute(result: r, notices: notices, onChangeTime: _changeTime)),
+            ]);
+          }
+          final options = _sorted(r);
+          final top = options.first;
+          final featured = _filter == _Filter.recommended ? top.isRecommended : top.tags.contains(_filter.name);
           return Column(children: [
+            header,
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              padding: const EdgeInsets.symmetric(horizontal: Space.l),
               child: Row(
-                children: SortBy.values
-                    .map((s) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                children: _Filter.values
+                    .map((f) => Padding(
+                          padding: const EdgeInsets.only(right: Space.s),
                           child: ChoiceChip(
-                            label: Text(switch (s) {
-                              SortBy.best => 'Recommended',
-                              SortBy.fastest => 'Fastest',
-                              SortBy.cheapest => 'Cheapest',
-                              SortBy.leastWalking => 'Least walking',
-                            }),
-                            selected: _sort == s,
-                            onSelected: (_) => setState(() => _sort = s),
+                            label: Text(f.label),
+                            selected: _filter == f,
+                            onSelected: (_) => setState(() => _filter = f),
                           ),
                         ))
                     .toList(),
               ),
             ),
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(12),
-                itemCount: options.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => RouteCard(
-                  option: options[i],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => JourneyScreen(option: options[i], from: widget.from, to: widget.to)),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  _reload();
+                  await _future.then((_) {}, onError: (_) {});
+                },
+                child: ListView(padding: const EdgeInsets.fromLTRB(Space.l, Space.s, Space.l, Space.xl), children: [
+                  for (final n in notices) Padding(padding: const EdgeInsets.only(bottom: Space.m), child: n),
+                  Semantics(
+                    liveRegion: true,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: Space.s),
+                      child: Text(
+                        '${plural(options.length, 'route')} found${_filter == _Filter.recommended ? '' : ' · sorted by ${_filter.label.toLowerCase()}'}',
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ),
                   ),
-                ),
+                  for (var i = 0; i < options.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: Space.m),
+                      child: RouteCard(
+                        option: options[i],
+                        featured: i == 0 && featured,
+                        featuredLabel: i == 0 && featured ? _filter.label : null,
+                        onOpen: () => _openJourney(r, options[i]),
+                        onBook: () => _book(r, options[i]),
+                      ),
+                    ),
+                  if (r.notRunning.isNotEmpty) _NotRunningTile(result: r),
+                ]),
               ),
             ),
           ]);
@@ -105,92 +197,82 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 }
 
-class RouteCard extends StatelessWidget {
-  final JourneyOption option;
-  final VoidCallback onTap;
-  const RouteCard({super.key, required this.option, required this.onTap});
+class _NoRoute extends StatelessWidget {
+  final PlanResult result;
+  final List<Widget> notices;
+  final VoidCallback onChangeTime;
+  const _NoRoute({required this.result, required this.notices, required this.onChangeTime});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final o = option;
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (o.tags.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Wrap(
-                  spacing: 6,
-                  children: o.tags
-                      .map((t) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: BorderRadius.circular(20)),
-                            child: Text(tagLabels[t] ?? t,
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scheme.onPrimaryContainer)),
-                          ))
-                      .toList(),
-                ),
-              ),
-            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(formatMin(o.totalMin), style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
-              const Spacer(),
-              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text(rupees(o.fare), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700, color: scheme.primary)),
-                if (o.standaloneFare > o.fare)
-                  Text(rupees(o.standaloneFare),
-                      style: text.bodySmall?.copyWith(decoration: TextDecoration.lineThrough, color: scheme.onSurfaceVariant)),
-              ]),
-            ]),
-            const SizedBox(height: 10),
-            LegSequence(legs: o.legs),
-            const SizedBox(height: 10),
-            DefaultTextStyle(
-              style: text.bodySmall!.copyWith(color: scheme.onSurfaceVariant),
-              child: Wrap(spacing: 14, runSpacing: 4, children: [
-                _Stat(Icons.directions_walk, formatDistance(o.walkM)),
-                _Stat(Icons.sync_alt, o.transfers == 0 ? 'Direct' : '${o.transfers} change${o.transfers == 1 ? '' : 's'}'),
-                _Stat(Icons.schedule, '${o.waitMin} min wait'),
-                _Stat(Icons.straighten, '${o.distanceKm.toStringAsFixed(1)} km'),
-              ]),
-            ),
-          ]),
+    final scheme = Theme.of(context).colorScheme;
+    final r = result;
+    final when = r.departAt.isEmpty ? 'right now' : 'at ${r.departAt}';
+    return ListView(padding: const EdgeInsets.all(Space.l), children: [
+      for (final n in notices) Padding(padding: const EdgeInsets.only(bottom: Space.m), child: n),
+      const SizedBox(height: Space.l),
+      Center(
+        child: Container(
+          padding: const EdgeInsets.all(Space.l),
+          decoration: BoxDecoration(color: scheme.surfaceContainerHighest, shape: BoxShape.circle),
+          child: Icon(Icons.route_outlined, size: 36, color: scheme.onSurfaceVariant),
         ),
+      ),
+      const SizedBox(height: Space.l),
+      Semantics(header: true, child: Text('No route $when', textAlign: TextAlign.center, style: text.titleLarge)),
+      const SizedBox(height: Space.s),
+      Text(
+        r.notRunning.isNotEmpty
+            ? 'No scheduled service connects these places $when. Some lines have finished or not started yet, listed below.'
+            : 'No scheduled service connects these places $when. Timetables are available for only some lines so far.',
+        textAlign: TextAlign.center,
+        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      ),
+      const SizedBox(height: Space.xl),
+      Wrap(alignment: WrapAlignment.center, spacing: Space.s, runSpacing: Space.s, children: [
+        FilledButton.icon(onPressed: onChangeTime, icon: const Icon(Icons.schedule), label: const Text('Try another time')),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.edit_location_alt_outlined),
+          label: const Text('Change stops'),
+        ),
+      ]),
+      if (r.notRunning.isNotEmpty) ...[
+        const SizedBox(height: Space.xl),
+        SectionHeader('Not running $when'),
+        Card(child: Column(children: _notRunningRows(r.notRunning))),
+      ],
+    ]);
+  }
+}
+
+class _NotRunningTile extends StatelessWidget {
+  final PlanResult result;
+  const _NotRunningTile({required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ExpansionTile(
+        shape: const Border(),
+        leading: Icon(Icons.info_outline, color: warningColor(context)),
+        title: Text('${plural(result.notRunning.length, 'line')} not running at ${result.departAt}'),
+        subtitle: const Text('Why some services are missing'),
+        children: _notRunningRows(result.notRunning),
       ),
     );
   }
 }
 
-class _Stat extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _Stat(this.icon, this.text);
-
-  @override
-  Widget build(BuildContext context) =>
-      Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 14), const SizedBox(width: 3), Text(text)]);
-}
-
-class _Message extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Widget? action;
-  const _Message({required this.icon, required this.text, this.action});
-
-  @override
-  Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 48, color: Theme.of(context).colorScheme.outline),
-            const SizedBox(height: 12),
-            Text(text, textAlign: TextAlign.center),
-            if (action != null) ...[const SizedBox(height: 16), action!],
-          ]),
-        ),
-      );
+List<Widget> _notRunningRows(List<NotRunningLine> lines) {
+  const order = {'ended': 0, 'notStarted': 1, 'noServiceToday': 2};
+  final sorted = [...lines]..sort((a, b) => (order[a.status] ?? 3).compareTo(order[b.status] ?? 3));
+  return sorted
+      .map((l) => ListTile(
+            leading: ModeChip(mode: l.mode, dense: true),
+            title: Text(l.name),
+            subtitle: Text(l.explanation),
+          ))
+      .toList();
 }
