@@ -4,10 +4,15 @@ A single journey planner and integrated ticket for public transport across **Ahm
 
 Built for **Metro Hacks, PS-08: One City, One Journey**. It also takes ideas from PS-10 (diversions), PS-11 (heat-aware routing) and PS-13 (management brief).
 
-| | Live |
+| | Link |
 |---|---|
+| **Android app (APK)** | [Download one-journey-v1.0.0.apk](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/download/v1.0.0/one-journey-v1.0.0.apk) ([release notes](https://github.com/Kaizenith-Technologies-LLP/one-city-one-journey/releases/tag/v1.0.0)) |
 | API | https://api-production-1452.up.railway.app/api |
 | Admin portal | https://admin-production-3546.up.railway.app |
+
+**Install the app:** open the APK link on an Android phone (Android 7.0+), then allow "Install unknown apps" when asked.
+
+**Try the API in a browser:** [a journey plan](https://api-production-1452.up.railway.app/api/plan?from=metro-thaltej-gam&to=metro-apmc&depart=09:00) · [interchange hubs](https://api-production-1452.up.railway.app/api/hubs) · [network summary](https://api-production-1452.up.railway.app/api/meta)
 
 ---
 
